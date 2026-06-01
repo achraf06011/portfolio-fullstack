@@ -1,108 +1,78 @@
-const initSqlJs = require('sql.js');
+const mysql = require('mysql2/promise');
 const bcrypt = require('bcryptjs');
-const path = require('path');
-const fs = require('fs');
 
-const DB_PATH = path.join(__dirname, 'portfolio.db.json');
-let db = null;
-let SQL = null;
-
-async function getSqlJs() {
-  if (!SQL) SQL = await initSqlJs();
-  return SQL;
-}
+// Configuration de la connexion (les infos te seront données par Aiven)
+// En attendant, ça se connectera à ton WAMP local si tu mets les infos classiques
+const pool = mysql.createPool({
+  host: process.env.DB_HOST || 'localhost',
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASSWORD || '',
+  database: process.env.DB_NAME || 'portfolio_db', // Pense à créer cette base dans phpMyAdmin en local
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
+});
 
 async function getDB() {
-  if (db) return db;
-  const Sql = await getSqlJs();
-  if (fs.existsSync(DB_PATH)) {
-    try {
-      const raw = JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
-      const buf = Buffer.from(raw, 'base64');
-      db = new Sql.Database(buf);
-    } catch (e) {
-      console.warn('⚠️  Database file corrupted, creating a fresh one...');
-      fs.unlinkSync(DB_PATH);
-      db = new Sql.Database();
-    }
-  } else {
-    db = new Sql.Database();
-  }
-  return db;
+  return pool;
 }
 
-function saveDB(db) {
-  const data = db.export();
-  const buf = Buffer.from(data);
-  fs.writeFileSync(DB_PATH, JSON.stringify(buf.toString('base64')));
+// Adaptation de tes fonctions pour qu'elles utilisent MySQL
+async function run(db, sql, params = []) {
+  await db.execute(sql, params);
 }
 
-function run(db, sql, params = []) {
-  db.run(sql, params);
-  saveDB(db);
+async function get(db, sql, params = []) {
+  const [rows] = await db.execute(sql, params);
+  return rows.length > 0 ? rows[0] : null;
 }
 
-function get(db, sql, params = []) {
-  const stmt = db.prepare(sql);
-  stmt.bind(params);
-  if (stmt.step()) {
-    const row = stmt.getAsObject();
-    stmt.free();
-    return row;
-  }
-  stmt.free();
-  return null;
-}
-
-function all(db, sql, params = []) {
-  const results = [];
-  const stmt = db.prepare(sql);
-  stmt.bind(params);
-  while (stmt.step()) results.push(stmt.getAsObject());
-  stmt.free();
-  return results;
+async function all(db, sql, params = []) {
+  const [rows] = await db.execute(sql, params);
+  return rows;
 }
 
 async function initDB() {
   const db = await getDB();
 
-  db.run(`CREATE TABLE IF NOT EXISTS admins (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    email TEXT UNIQUE NOT NULL,
-    password TEXT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  );`);
+  // Création des tables
+  await db.execute(`CREATE TABLE IF NOT EXISTS admins (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(191) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  )`);
 
-  db.run(`CREATE TABLE IF NOT EXISTS projects (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    title TEXT NOT NULL,
+  await db.execute(`CREATE TABLE IF NOT EXISTS projects (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
-    technologies TEXT NOT NULL,
-    video_url TEXT,
-    website_url TEXT,
-    github_url TEXT,
-    thumbnail TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  );`);
+    technologies VARCHAR(255) NOT NULL,
+    video_url VARCHAR(255),
+    website_url VARCHAR(255),
+    github_url VARCHAR(255),
+    thumbnail VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  )`);
 
-  db.run(`CREATE TABLE IF NOT EXISTS messages (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    email TEXT NOT NULL,
+  await db.execute(`CREATE TABLE IF NOT EXISTS messages (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
     message TEXT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  );`);
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  )`);
 
-  saveDB(db);
-
-  const existing = get(db, 'SELECT id FROM admins WHERE email = ?', ['aaachchak@gmail.com']);
+  // Vérification de l'admin
+  const existing = await get(db, 'SELECT id FROM admins WHERE email = ?', ['aaachchak@gmail.com']);
   if (!existing) {
     const hashed = await bcrypt.hash('Achrafreali06', 12);
-    run(db, 'INSERT INTO admins (email, password) VALUES (?, ?)', ['aaachchak@gmail.com', hashed]);
+    await run(db, 'INSERT INTO admins (email, password) VALUES (?, ?)', ['aaachchak@gmail.com', hashed]);
     console.log('✅ Admin account created');
   }
 
-  const countRes = get(db, 'SELECT COUNT(*) as count FROM projects');
+  // Vérification des projets de base
+  const countRes = await get(db, 'SELECT COUNT(*) as count FROM projects');
   if (!countRes || countRes.count === 0) {
     const samples = [
       ['E-Commerce Platform', "Plateforme e-commerce complète avec gestion des produits, panier d'achat, paiement en ligne et tableau de bord admin.", 'React,Node.js,Express,MySQL,Stripe,JWT', null, 'https://example.com', 'https://github.com/achraf', null],
@@ -110,7 +80,7 @@ async function initDB() {
       ['Portfolio Interactif', 'Portfolio professionnel avec animations 3D, espace admin pour gérer les projets et upload de vidéos de démonstration.', 'React,Node.js,SQLite,Framer Motion', null, null, 'https://github.com/achraf', null],
     ];
     for (const s of samples) {
-      run(db, 'INSERT INTO projects (title,description,technologies,video_url,website_url,github_url,thumbnail) VALUES (?,?,?,?,?,?,?)', s);
+      await run(db, 'INSERT INTO projects (title,description,technologies,video_url,website_url,github_url,thumbnail) VALUES (?,?,?,?,?,?,?)', s);
     }
     console.log('✅ Sample projects seeded');
   }
@@ -118,4 +88,4 @@ async function initDB() {
   console.log('✅ Database initialized');
 }
 
-module.exports = { getDB, initDB, run, get, all, saveDB };
+module.exports = { getDB, initDB, run, get, all };
