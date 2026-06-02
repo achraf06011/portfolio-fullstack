@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { Github, Linkedin, Mail, Download, ArrowDown, Code2, Zap, Globe } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import monCV from '../CV_ACHRAF_AACHCHAK.pdf';
+import monCV from '../CV_ACHRAF_AACHCHAK_WITH_PORTFOLIO.pdf';
 
 const socialLinks = [
   { icon: Github, href: 'https://github.com/achraf06011', label: 'GitHub' },
