@@ -9,7 +9,7 @@ router.post('/', async (req, res) => {
   if (!name || !email || !message) return res.status(400).json({ error: 'All fields required' });
   try {
     const db = await getDB();
-    run(db, 'INSERT INTO messages (name, email, message) VALUES (?, ?, ?)', [name, email, message]);
+    await run(db, 'INSERT INTO messages (name, email, message) VALUES (?, ?, ?)', [name, email, message]);
     res.json({ message: 'Message sent successfully!' });
   } catch (err) { res.status(500).json({ error: 'Server error' }); }
 });
@@ -17,7 +17,7 @@ router.post('/', async (req, res) => {
 router.get('/', authMiddleware, async (req, res) => {
   try {
     const db = await getDB();
-    const messages = all(db, 'SELECT * FROM messages ORDER BY created_at DESC');
+    const messages = await all(db, 'SELECT * FROM messages ORDER BY created_at DESC');
     res.json(messages);
   } catch (err) { res.status(500).json({ error: 'Server error' }); }
 });

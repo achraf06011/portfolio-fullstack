@@ -12,7 +12,7 @@ router.post('/login', async (req, res) => {
 
   try {
     const db = await getDB();
-    const admin = get(db, 'SELECT * FROM admins WHERE email = ?', [email]);
+    const admin = await get(db, 'SELECT * FROM admins WHERE email = ?', [email]);
     if (!admin) return res.status(401).json({ error: 'Invalid credentials' });
 
     const valid = await bcrypt.compare(password, admin.password);
