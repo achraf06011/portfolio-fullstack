@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, Edit2, Trash2, X, Save, Upload, Play, Link, Github, Image, LogOut, LayoutDashboard, MessageSquare, FolderOpen, Eye } from 'lucide-react'
+import { Plus, Edit2, Trash2, X, Save, Play, Link, Github, Image, LogOut, MessageSquare, FolderOpen, Eye } from 'lucide-react'
 import axios from 'axios'
 import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
@@ -8,24 +8,13 @@ import { useNavigate } from 'react-router-dom'
 const emptyForm = {
   title: '', description: '', technologies: '',
   website_url: '', github_url: '',
-  video: null, thumbnail: null,
-  videoPreview: null, thumbPreview: null
+  video_url: '', thumbnail: ''
 }
 
 function ProjectForm({ initial, onSave, onCancel, loading }) {
   const [form, setForm] = useState(initial || emptyForm)
-  const videoRef = useRef()
-  const thumbRef = useRef()
 
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }))
-
-  const handleFile = (field, previewField, file) => {
-    if (!file) return
-    set(field, file)
-    const reader = new FileReader()
-    reader.onload = e => set(previewField, e.target.result)
-    reader.readAsDataURL(file)
-  }
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -62,71 +51,30 @@ function ProjectForm({ initial, onSave, onCancel, loading }) {
         </div>
       </div>
 
-      {/* Video upload */}
+      {/* Video URL */}
       <div>
-        <label className="flex items-center gap-2"><Play size={10} />Vidéo du projet (MP4, WebM)</label>
-        <div
-          className="relative border border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors"
-          style={{ borderColor: form.videoPreview ? 'rgba(108, 99, 255, 0.5)' : 'rgba(108, 99, 255, 0.2)',
-            background: 'rgba(108, 99, 255, 0.03)' }}
-          onClick={() => videoRef.current?.click()}
-        >
-          <input
-            ref={videoRef}
-            type="file"
-            accept="video/mp4,video/webm"
-            className="hidden"
-            onChange={e => handleFile('video', 'videoPreview', e.target.files[0])}
-          />
-          {form.videoPreview ? (
-            <div className="space-y-3">
-              <video src={form.videoPreview} className="max-h-32 mx-auto rounded" controls onClick={e => e.stopPropagation()} />
-              <p className="text-xs text-accent font-mono">{form.video?.name}</p>
-            </div>
-          ) : initial?.video_url ? (
-            <div className="space-y-2">
-              <Play size={20} className="text-accent mx-auto" />
-              <p className="text-xs text-accent/70 font-mono">Vidéo existante • Cliquer pour remplacer</p>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              <Upload size={20} className="text-muted mx-auto" />
-              <p className="text-xs text-muted">Cliquer pour uploader une vidéo</p>
-              <p className="text-xs text-muted/50 font-mono">Format : MP4 ou WebM</p>
-            </div>
-          )}
-        </div>
+        <label className="flex items-center gap-2"><Play size={10} />URL de la vidéo (facultatif)</label>
+        <input
+          value={form.video_url}
+          onChange={e => set('video_url', e.target.value)}
+          placeholder="https://... (lien direct MP4, Google Drive, etc.)"
+        />
+        {form.video_url && (
+          <video src={form.video_url} className="mt-2 max-h-32 rounded w-full" controls />
+        )}
       </div>
 
-      {/* Thumbnail upload */}
+      {/* Thumbnail URL */}
       <div>
-        <label className="flex items-center gap-2"><Image size={10} />Image miniature (facultatif)</label>
-        <div
-          className="relative border border-dashed rounded-lg p-5 text-center cursor-pointer transition-colors"
-          style={{ borderColor: 'rgba(108, 99, 255, 0.2)', background: 'rgba(108, 99, 255, 0.02)' }}
-          onClick={() => thumbRef.current?.click()}
-        >
-          <input
-            ref={thumbRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={e => handleFile('thumbnail', 'thumbPreview', e.target.files[0])}
-          />
-          {form.thumbPreview ? (
-            <img src={form.thumbPreview} className="max-h-24 mx-auto rounded object-cover" alt="preview" />
-          ) : initial?.thumbnail ? (
-            <div className="space-y-1">
-              <Image size={16} className="text-accent mx-auto" />
-              <p className="text-xs text-accent/70 font-mono">Image existante • Cliquer pour remplacer</p>
-            </div>
-          ) : (
-            <div className="flex items-center justify-center gap-2 text-muted">
-              <Image size={14} />
-              <span className="text-xs">Uploader une image de couverture</span>
-            </div>
-          )}
-        </div>
+        <label className="flex items-center gap-2"><Image size={10} />URL de l'image miniature (facultatif)</label>
+        <input
+          value={form.thumbnail}
+          onChange={e => set('thumbnail', e.target.value)}
+          placeholder="https://... (lien direct vers une image)"
+        />
+        {form.thumbnail && (
+          <img src={form.thumbnail} className="mt-2 max-h-24 rounded object-cover" alt="preview" />
+        )}
       </div>
 
       <div className="flex gap-3 pt-4">
@@ -166,24 +114,25 @@ export default function Admin() {
   const handleSave = async (form) => {
     setSaving(true)
     try {
-      const fd = new FormData()
-      fd.append('title', form.title)
-      fd.append('description', form.description)
-      fd.append('technologies', form.technologies)
-      fd.append('website_url', form.website_url || '')
-      fd.append('github_url', form.github_url || '')
-      if (form.video) fd.append('video', form.video)
-      if (form.thumbnail) fd.append('thumbnail', form.thumbnail)
-
+      const payload = {
+        title: form.title,
+        description: form.description,
+        technologies: form.technologies,
+        website_url: form.website_url || null,
+        github_url: form.github_url || null,
+        video_url: form.video_url || null,
+        thumbnail: form.thumbnail || null,
+      }
       if (modal === 'add') {
-        await axios.post('/api/projects', fd)
+        await axios.post('/api/projects', payload)
       } else {
-        await axios.put(`/api/projects/${modal.id}`, fd)
+        await axios.put(`/api/projects/${modal.id}`, payload)
       }
       load()
       setModal(null)
     } catch (err) {
-      alert(err.response?.data?.error || 'Erreur lors de la sauvegarde')
+      const msg = err.response?.data?.error || err.message || 'Erreur lors de la sauvegarde'
+      alert(typeof msg === 'string' ? msg : JSON.stringify(msg))
     } finally {
       setSaving(false)
     }
