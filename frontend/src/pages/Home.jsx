@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import { Github, Linkedin, Mail, Download, ArrowDown, Code2, Zap, Globe } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import monCV from '../CV_ACHRAF_AACHCHAK.pdf';
+import myPhoto from '../image.png';
 
 const socialLinks = [
   { icon: Github, href: 'https://github.com/achraf06011', label: 'GitHub' },
@@ -130,13 +131,7 @@ export default function Home() {
               <div className="relative w-64 h-64 lg:w-80 lg:h-80">
                 <div className="absolute inset-0 bg-gradient-to-br from-accent/30 to-accent-2/20 rounded-full blur-2xl" />
                 <div className="relative w-full h-full rounded-full glass-strong overflow-hidden border-2 border-accent/30 animate-float">
-                  {/* Placeholder avatar */}
-                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-surface to-panel">
-                    <div className="text-center">
-                      <div className="font-display text-6xl font-light gradient-text">AA</div>
-                      <div className="font-mono text-xs text-accent mt-2 tracking-widest">DEV</div>
-                    </div>
-                  </div>
+                  <img src={myPhoto} alt="Achraf Aachchak" className="w-full h-full object-cover object-top" />
                 </div>
               </div>
 
