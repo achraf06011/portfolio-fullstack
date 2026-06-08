@@ -1,12 +1,13 @@
 import { motion } from 'framer-motion'
-import { Github, Linkedin, Mail, Download, ArrowDown, Code2, Zap, Globe } from 'lucide-react'
+import { Github, Linkedin, Mail, Download, ArrowDown, Code2, Zap, Globe, Phone } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import monCV from '../CV_ACHRAF_AACHCHAK_WITH_PORTFOLIO.pdf';
 
 const socialLinks = [
   { icon: Github, href: 'https://github.com/achraf06011', label: 'GitHub' },
-  { icon: Linkedin, href: 'https://linkedin.com/in/achraf-aachchak-6a5578313', label: 'LinkedIn' },
+  { icon: Linkedin, href: 'https://www.linkedin.com/in/achraf-aachchak-6a5578313', label: 'LinkedIn' },
   { icon: Mail, href: 'mailto:aaachchak@gmail.com', label: 'Email' },
+  { icon: Phone, href: 'tel:+212697601775', label: '+212 697-601775' },
 ]
 
 const stats = [

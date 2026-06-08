@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Send, Mail, Github, Linkedin, MapPin, CheckCircle, AlertCircle } from 'lucide-react'
+import { Send, Mail, Github, Linkedin, MapPin, CheckCircle, AlertCircle, Phone } from 'lucide-react'
 import axios from 'axios'
 
 export default function Contact() {
@@ -63,9 +63,10 @@ export default function Contact() {
             <div className="space-y-5">
               {[
                 { icon: Mail, label: 'Email', value: 'aaachchak@gmail.com', href: 'mailto:aaachchak@gmail.com' },
+                { icon: Phone, label: 'Téléphone', value: '+212 (0)697-601775', href: 'tel:+212697601775' },
                 { icon: MapPin, label: 'Localisation', value: 'Maroc', href: null },
-                { icon: Github, label: 'GitHub', value: 'github.com/achraf', href: 'https://github.com/achraf' },
-                { icon: Linkedin, label: 'LinkedIn', value: 'linkedin.com/in/achraf', href: 'https://linkedin.com/in/achraf' },
+                { icon: Github, label: 'GitHub', value: 'github.com/achraf06011', href: 'https://github.com/achraf06011' },
+                { icon: Linkedin, label: 'LinkedIn', value: 'linkedin.com/in/achraf-aachchak', href: 'https://www.linkedin.com/in/achraf-aachchak-6a5578313' },
               ].map(({ icon: Icon, label, value, href }) => (
                 <div key={label} className="flex items-center gap-4 group">
                   <div className="w-10 h-10 rounded-lg glass flex items-center justify-center border border-accent/20 group-hover:border-accent/50 transition-colors">
