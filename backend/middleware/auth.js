@@ -8,7 +8,7 @@ function authMiddleware(req, res, next) {
 
   const token = authHeader.split(' ')[1];
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'achraf_portfolio_secret_key_2024_very_long_and_secure');
     req.admin = decoded;
     next();
   } catch (err) {

@@ -18,7 +18,8 @@ router.post('/login', async (req, res) => {
     const valid = await bcrypt.compare(password, admin.password);
     if (!valid) return res.status(401).json({ error: 'Invalid credentials' });
 
-    const token = jwt.sign({ id: admin.id, email: admin.email }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    const secret = process.env.JWT_SECRET || 'achraf_portfolio_secret_key_2024_very_long_and_secure';
+    const token = jwt.sign({ id: admin.id, email: admin.email }, secret, { expiresIn: '7d' });
     res.json({ token, admin: { id: admin.id, email: admin.email } });
   } catch (err) {
     console.error(err);
