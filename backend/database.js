@@ -1,22 +1,21 @@
-const mysql = require('mysql2/promise');
+const { Pool } = require('pg');
 const bcrypt = require('bcryptjs');
 
 let pool = null;
 
 function getPool() {
   if (!pool) {
-    pool = mysql.createPool({
-      host: process.env.DB_HOST,
-      port: parseInt(process.env.DB_PORT) || 3306,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-      ssl: { rejectUnauthorized: false },
-      waitForConnections: true,
-      connectionLimit: 10,
+    pool = new Pool({
+      connectionString: process.env.DATABASE_URL,
+      ssl: { rejectUnauthorized: false }
     });
   }
   return pool;
+}
+
+function toPostgres(sql) {
+  let i = 0;
+  return sql.replace(/\?/g, () => `$${++i}`);
 }
 
 async function getDB() {
@@ -24,17 +23,21 @@ async function getDB() {
 }
 
 async function run(db, sql, params = []) {
-  const [result] = await db.execute(sql, params);
-  return result;
+  let pgSql = toPostgres(sql);
+  if (pgSql.trim().toUpperCase().startsWith('INSERT') && !pgSql.toUpperCase().includes('RETURNING')) {
+    pgSql += ' RETURNING id';
+  }
+  const { rows } = await db.query(pgSql, params);
+  return { insertId: rows[0]?.id, rows };
 }
 
 async function get(db, sql, params = []) {
-  const [rows] = await db.execute(sql, params);
+  const { rows } = await db.query(toPostgres(sql), params);
   return rows[0] || null;
 }
 
 async function all(db, sql, params = []) {
-  const [rows] = await db.execute(sql, params);
+  const { rows } = await db.query(toPostgres(sql), params);
   return rows;
 }
 
@@ -43,15 +46,15 @@ function saveDB() {}
 async function initDB() {
   const db = getPool();
 
-  await db.execute(`CREATE TABLE IF NOT EXISTS admins (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+  await db.query(`CREATE TABLE IF NOT EXISTS admins (
+    id SERIAL PRIMARY KEY,
     email VARCHAR(255) UNIQUE NOT NULL,
     password TEXT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`);
 
-  await db.execute(`CREATE TABLE IF NOT EXISTS projects (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+  await db.query(`CREATE TABLE IF NOT EXISTS projects (
+    id SERIAL PRIMARY KEY,
     title VARCHAR(500) NOT NULL,
     description TEXT NOT NULL,
     technologies TEXT NOT NULL,
@@ -59,21 +62,21 @@ async function initDB() {
     website_url TEXT,
     github_url TEXT,
     thumbnail TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`);
 
-  await db.execute(`CREATE TABLE IF NOT EXISTS messages (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+  await db.query(`CREATE TABLE IF NOT EXISTS messages (
+    id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL,
     message TEXT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   )`);
 
-  const [rows] = await db.execute('SELECT id FROM admins WHERE email = ?', ['aaachchak@gmail.com']);
+  const { rows } = await db.query('SELECT id FROM admins WHERE email = $1', ['aaachchak@gmail.com']);
   if (rows.length === 0) {
     const hashed = await bcrypt.hash('Achrafreali06', 12);
-    await db.execute('INSERT INTO admins (email, password) VALUES (?, ?)', ['aaachchak@gmail.com', hashed]);
+    await db.query('INSERT INTO admins (email, password) VALUES ($1, $2)', ['aaachchak@gmail.com', hashed]);
     console.log('✅ Admin account created');
   }
 
