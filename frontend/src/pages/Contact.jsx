@@ -63,7 +63,7 @@ export default function Contact() {
             <div className="space-y-5">
               {[
                 { icon: Mail, label: 'Email', value: 'aaachchak@gmail.com', href: 'mailto:aaachchak@gmail.com' },
-                { icon: Phone, label: 'Téléphone', value: '+212 (0)697-601775', href: 'tel:+212697601775' },
+                { icon: Phone, label: 'Téléphone', value: '+212 (0)697-601775', href: null },
                 { icon: MapPin, label: 'Localisation', value: 'Maroc', href: null },
                 { icon: Github, label: 'GitHub', value: 'github.com/achraf06011', href: 'https://github.com/achraf06011' },
                 { icon: Linkedin, label: 'LinkedIn', value: 'linkedin.com/in/achraf-aachchak', href: 'https://www.linkedin.com/in/achraf-aachchak-6a5578313' },

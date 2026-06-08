@@ -7,7 +7,7 @@ const socialLinks = [
   { icon: Github, href: 'https://github.com/achraf06011', label: 'GitHub' },
   { icon: Linkedin, href: 'https://www.linkedin.com/in/achraf-aachchak-6a5578313', label: 'LinkedIn' },
   { icon: Mail, href: 'mailto:aaachchak@gmail.com', label: 'Email' },
-  { icon: Phone, href: 'tel:+212697601775', label: '+212 697-601775' },
+  { icon: Phone, href: null, label: '+212 697-601775' },
 ]
 
 const stats = [
@@ -101,16 +101,23 @@ export default function Home() {
               className="flex items-center gap-6"
             >
               {socialLinks.map(({ icon: Icon, href, label }) => (
-                <a
-                  key={label}
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-muted hover:text-accent transition-all duration-300 group"
-                >
-                  <Icon size={18} className="group-hover:scale-110 transition-transform" />
-                  <span className="text-xs tracking-widest uppercase hidden sm:block">{label}</span>
-                </a>
+                href ? (
+                  <a
+                    key={label}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-muted hover:text-accent transition-all duration-300 group"
+                  >
+                    <Icon size={18} className="group-hover:scale-110 transition-transform" />
+                    <span className="text-xs tracking-widest uppercase hidden sm:block">{label}</span>
+                  </a>
+                ) : (
+                  <div key={label} className="flex items-center gap-2 text-muted group">
+                    <Icon size={18} />
+                    <span className="text-xs tracking-widest hidden sm:block">{label}</span>
+                  </div>
+                )
               ))}
             </motion.div>
           </div>
