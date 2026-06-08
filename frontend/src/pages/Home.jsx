@@ -1,7 +1,8 @@
 import { motion } from 'framer-motion'
 import { Github, Linkedin, Mail, Download, ArrowDown, Code2, Zap, Globe, Phone } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import monCV from '../CV_ACHRAF_AACHCHAK_WITH_PORTFOLIO.pdf';
+import monCV from '../CV_ACHRAF_AACHCHAK_WITH_PORTFOLIO.pdf'
+import PhonePopup from '../components/PhonePopup'
 
 const socialLinks = [
   { icon: Github, href: 'https://github.com/achraf06011', label: 'GitHub' },
@@ -113,10 +114,10 @@ export default function Home() {
                     <span className="text-xs tracking-widest uppercase hidden sm:block">{label}</span>
                   </a>
                 ) : (
-                  <div key={label} className="flex items-center gap-2 text-muted group">
-                    <Icon size={18} />
+                  <PhonePopup key={label}>
+                    <Icon size={18} className="group-hover:scale-110 transition-transform" />
                     <span className="text-xs tracking-widest hidden sm:block">{label}</span>
-                  </div>
+                  </PhonePopup>
                 )
               ))}
             </motion.div>

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Send, Mail, Github, Linkedin, MapPin, CheckCircle, AlertCircle, Phone } from 'lucide-react'
+import PhonePopup from '../components/PhonePopup'
 import axios from 'axios'
 
 export default function Contact() {
@@ -63,7 +64,6 @@ export default function Contact() {
             <div className="space-y-5">
               {[
                 { icon: Mail, label: 'Email', value: 'aaachchak@gmail.com', href: 'mailto:aaachchak@gmail.com' },
-                { icon: Phone, label: 'Téléphone', value: '+212 (0)697-601775', href: null },
                 { icon: MapPin, label: 'Localisation', value: 'Maroc', href: null },
                 { icon: Github, label: 'GitHub', value: 'github.com/achraf06011', href: 'https://github.com/achraf06011' },
                 { icon: Linkedin, label: 'LinkedIn', value: 'linkedin.com/in/achraf-aachchak', href: 'https://www.linkedin.com/in/achraf-aachchak-6a5578313' },
@@ -83,6 +83,19 @@ export default function Contact() {
                   </div>
                 </div>
               ))}
+
+              {/* Téléphone avec popup */}
+              <PhonePopup>
+                <div className="flex items-center gap-4 group w-full">
+                  <div className="w-10 h-10 rounded-lg glass flex items-center justify-center border border-accent/20 group-hover:border-accent/50 transition-colors">
+                    <Phone size={16} className="text-accent" />
+                  </div>
+                  <div className="text-left">
+                    <div className="text-xs font-mono text-muted/60 tracking-widest uppercase">Téléphone</div>
+                    <div className="text-sm text-white/80 group-hover:text-accent transition-colors">+212 (0)697-601775</div>
+                  </div>
+                </div>
+              </PhonePopup>
             </div>
 
             {/* Availability badge */}
