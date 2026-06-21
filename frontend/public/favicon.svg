@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a89cff"/>
+      <stop offset="100%" stop-color="#6c63ff"/>
+    </linearGradient>
+  </defs>
+  <!-- Fond sombre arrondi -->
+  <rect width="32" height="32" fill="#050508" rx="7"/>
+  <!-- Diamond extérieur -->
+  <path d="M16 3 L29 16 L16 29 L3 16 Z" fill="url(#g)"/>
+  <!-- Trou intérieur -->
+  <path d="M16 9 L23 16 L16 23 L9 16 Z" fill="#050508"/>
+  <!-- Centre accent -->
+  <path d="M16 12.5 L19.5 16 L16 19.5 L12.5 16 Z" fill="url(#g)"/>
+</svg>
