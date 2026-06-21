@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X, LogIn, LogOut, LayoutDashboard } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
+import Logo from './Logo'
 
 const navLinks = [
   { to: '/', label: 'Accueil' },
@@ -43,10 +44,12 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-3 group">
-          <div className="w-8 h-8 relative">
-            <div className="absolute inset-0 bg-accent rounded-sm rotate-45 group-hover:rotate-[135deg] transition-transform duration-500" />
-            <div className="absolute inset-1 bg-void rounded-sm rotate-45" />
-          </div>
+          <motion.div
+            whileHover={{ scale: 1.1, rotate: 5 }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
+          >
+            <Logo size={38} />
+          </motion.div>
           <span className="font-display text-xl font-light tracking-wider text-white">
             AA<span className="text-accent">.</span>
           </span>
