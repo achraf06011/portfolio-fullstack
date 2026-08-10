@@ -187,6 +187,15 @@ Modifiez `backend/.env` :
 ```env
 PORT=5000
 JWT_SECRET=votre_secret_fort_ici
+DATABASE_URL=postgresql://...
+
+# Notification email du formulaire de contact
+CONTACT_TO=aaachchak@gmail.com
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=465
+SMTP_USER=votre_email@gmail.com
+SMTP_PASS=votre_mot_de_passe_application
+SMTP_FROM=votre_email@gmail.com
 ```
 
 ---

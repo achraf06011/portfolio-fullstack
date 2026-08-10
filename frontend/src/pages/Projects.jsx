@@ -71,7 +71,10 @@ function VideoModal({ project, onClose }) {
 
 function ProjectCard({ project, index }) {
   const [showVideo, setShowVideo] = useState(false)
-  const techs = project.technologies ? project.technologies.split(',').map(t => t.trim()) : []
+  const [showAllTechs, setShowAllTechs] = useState(false)
+  const techs = project.technologies ? project.technologies.split(',').map(t => t.trim()).filter(Boolean) : []
+  const visibleTechs = showAllTechs ? techs : techs.slice(0, 4)
+  const hiddenTechsCount = techs.length - 4
 
   return (
     <>
@@ -140,11 +143,19 @@ function ProjectCard({ project, index }) {
 
           {/* Technologies */}
           <div className="flex flex-wrap gap-2 mb-6">
-            {techs.slice(0, 4).map(tech => (
-              <span key={tech} className="tag">{tech}</span>
+            {visibleTechs.map((tech, techIndex) => (
+              <span key={`${tech}-${techIndex}`} className="tag">{tech}</span>
             ))}
-            {techs.length > 4 && (
-              <span className="tag">+{techs.length - 4}</span>
+            {hiddenTechsCount > 0 && (
+              <button
+                type="button"
+                onClick={() => setShowAllTechs(current => !current)}
+                className="tag hover:border-accent hover:text-white transition-colors"
+                aria-expanded={showAllTechs}
+                aria-label={showAllTechs ? 'Masquer les technologies' : `Afficher ${hiddenTechsCount} technologies supplémentaires`}
+              >
+                {showAllTechs ? 'Réduire' : `+${hiddenTechsCount}`}
+              </button>
             )}
           </div>
 

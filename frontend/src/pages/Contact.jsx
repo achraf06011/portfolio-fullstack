@@ -7,6 +7,7 @@ import axios from 'axios'
 export default function Contact() {
   const [form, setForm] = useState({ name: '', email: '', message: '' })
   const [status, setStatus] = useState(null) // 'success' | 'error' | null
+  const [statusMessage, setStatusMessage] = useState('')
   const [loading, setLoading] = useState(false)
 
   const handleChange = e => setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
@@ -15,12 +16,15 @@ export default function Contact() {
     e.preventDefault()
     setLoading(true)
     setStatus(null)
+    setStatusMessage('')
     try {
-      await axios.post('/api/contact', form)
+      const res = await axios.post('/api/contact', form)
       setStatus('success')
+      setStatusMessage(res.data?.message || 'Message envoyé avec succès !')
       setForm({ name: '', email: '', message: '' })
-    } catch {
+    } catch (err) {
       setStatus('error')
+      setStatusMessage(err.response?.data?.error || "Erreur lors de l'envoi. Réessayez.")
     } finally {
       setLoading(false)
     }
@@ -163,7 +167,7 @@ export default function Contact() {
                     style={{ background: 'rgba(74, 222, 128, 0.1)', border: '1px solid rgba(74, 222, 128, 0.3)' }}
                   >
                     <CheckCircle size={16} className="text-green-400" />
-                    <span className="text-sm text-green-400">Message envoyé avec succès !</span>
+                    <span className="text-sm text-green-400">{statusMessage}</span>
                   </motion.div>
                 )}
 
@@ -175,7 +179,7 @@ export default function Contact() {
                     style={{ background: 'rgba(255, 101, 132, 0.1)', border: '1px solid rgba(255, 101, 132, 0.3)' }}
                   >
                     <AlertCircle size={16} className="text-accent-2" />
-                    <span className="text-sm text-accent-2">Erreur lors de l'envoi. Réessayez.</span>
+                    <span className="text-sm text-accent-2">{statusMessage}</span>
                   </motion.div>
                 )}
 
