@@ -2,7 +2,7 @@ const { Pool } = require('pg');
 const bcrypt = require('bcryptjs');
 
 let pool = null;
-let useMemoryStore = !process.env.DATABASE_URL;
+let useMemoryStore = !process.env.DATABASE_URL || (process.env.VERCEL && process.env.USE_POSTGRES !== 'true');
 let nextProjectId = 5;
 let nextMessageId = 2;
 
