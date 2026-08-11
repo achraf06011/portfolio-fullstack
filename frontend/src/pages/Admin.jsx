@@ -99,12 +99,33 @@ export default function Admin() {
   const [deleteId, setDeleteId] = useState(null)
   const [saving, setSaving] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState(null)
   const { logout } = useAuth()
   const navigate = useNavigate()
 
-  const load = () => {
-    axios.get('/api/projects').then(r => setProjects(r.data))
-    axios.get('/api/contact').then(r => setMessages(r.data)).catch(() => {})
+  const load = async () => {
+    setLoading(true)
+    setLoadError(null)
+
+    const [projectsResult, messagesResult] = await Promise.allSettled([
+      axios.get('/api/projects'),
+      axios.get('/api/contact')
+    ])
+
+    if (projectsResult.status === 'fulfilled') {
+      setProjects(projectsResult.value.data)
+    } else {
+      setLoadError('Impossible de charger les projets pour le moment.')
+    }
+
+    if (messagesResult.status === 'fulfilled') {
+      setMessages(messagesResult.value.data)
+    } else {
+      setMessages([])
+    }
+
+    setLoading(false)
   }
 
   useEffect(() => { load() }, [])
@@ -128,7 +149,7 @@ export default function Admin() {
       } else {
         await axios.put(`/api/projects/${modal.id}`, payload)
       }
-      load()
+      await load()
       setModal(null)
     } catch (err) {
       const msg = err.response?.data?.error || err.message || 'Erreur lors de la sauvegarde'
@@ -143,7 +164,7 @@ export default function Admin() {
     setDeleting(true)
     try {
       await axios.delete(`/api/projects/${deleteId}`)
-      load()
+      await load()
       setDeleteId(null)
     } catch {
       alert('Erreur lors de la suppression')
@@ -226,7 +247,16 @@ export default function Admin() {
               </button>
             </div>
 
-            {projects.length === 0 ? (
+            {loading ? (
+              <div className="glass rounded-lg p-16 text-center">
+                <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                <p className="text-muted">Chargement des projets...</p>
+              </div>
+            ) : loadError ? (
+              <div className="glass rounded-lg p-16 text-center">
+                <p className="text-accent-2 font-mono text-sm">{loadError}</p>
+              </div>
+            ) : projects.length === 0 ? (
               <div className="glass rounded-lg p-16 text-center">
                 <FolderOpen size={40} className="text-muted/30 mx-auto mb-4" />
                 <p className="text-muted">Aucun projet. Créez-en un !</p>
