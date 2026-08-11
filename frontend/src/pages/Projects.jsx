@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ExternalLink, Github, Play, X, Code2, Calendar } from 'lucide-react'
 import axios from 'axios'
+import { fallbackProjects } from '../data/fallbackProjects'
 
 function getDriveId(url) {
   const m = url?.match(/drive\.google\.com\/file\/d\/([^/?]+)/)
@@ -205,7 +206,10 @@ export default function Projects() {
   useEffect(() => {
     axios.get('/api/projects')
       .then(res => setProjects(res.data))
-      .catch(() => setError('Impossible de charger les projets'))
+      .catch(() => {
+        setProjects(fallbackProjects)
+        setError(null)
+      })
       .finally(() => setLoading(false))
   }, [])
 
