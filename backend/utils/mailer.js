@@ -1,5 +1,3 @@
-const nodemailer = require('nodemailer');
-
 const CONTACT_TO = process.env.CONTACT_TO || 'aaachchak@gmail.com';
 
 function hasSmtpConfig() {
@@ -7,6 +5,7 @@ function hasSmtpConfig() {
 }
 
 function createTransporter() {
+  const nodemailer = require('nodemailer');
   const port = Number(process.env.SMTP_PORT || 587);
 
   return nodemailer.createTransport({

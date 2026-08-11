@@ -1,8 +1,5 @@
-const { Pool } = require('pg');
-const bcrypt = require('bcryptjs');
-
 let pool = null;
-let useMemoryStore = !process.env.DATABASE_URL || (process.env.VERCEL && process.env.USE_POSTGRES !== 'true');
+let useMemoryStore = !process.env.DATABASE_URL;
 let nextProjectId = 5;
 let nextMessageId = 2;
 
@@ -77,6 +74,7 @@ function getPool() {
     if (!process.env.DATABASE_URL) {
       throw new Error('DATABASE_URL is not configured');
     }
+    const { Pool } = require('pg');
     pool = new Pool({
       connectionString: process.env.DATABASE_URL,
       ssl: { rejectUnauthorized: false },
@@ -162,6 +160,7 @@ async function initDB() {
 
     const { rows } = await db.query('SELECT id FROM admins WHERE email = $1', ['aaachchak@gmail.com']);
     if (rows.length === 0) {
+      const bcrypt = require('bcryptjs');
       const hashed = await bcrypt.hash('Achrafreali06', 12);
       await db.query('INSERT INTO admins (email, password) VALUES ($1, $2)', ['aaachchak@gmail.com', hashed]);
       console.log('Admin account created');
