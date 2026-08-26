@@ -7,7 +7,7 @@ export const fallbackProjects = [
     video_url: null,
     website_url: null,
     github_url: null,
-    thumbnail: null,
+    thumbnail: '/project-thumbnails/1780349216166-113261605.png',
     created_at: '2026-06-01 21:26:56'
   },
   {
@@ -18,7 +18,7 @@ export const fallbackProjects = [
     video_url: null,
     website_url: null,
     github_url: 'https://github.com/achraf06011/site_fluxo.git',
-    thumbnail: null,
+    thumbnail: '/project-thumbnails/1780344866600-473770370.png',
     created_at: '2026-06-01 20:14:26'
   },
   {
@@ -40,7 +40,7 @@ export const fallbackProjects = [
     video_url: null,
     website_url: null,
     github_url: 'https://github.com/achraf06011/site_fluxo.git',
-    thumbnail: null,
+    thumbnail: '/project-thumbnails/1780348597641-353906712.jpeg',
     created_at: '2026-06-01 21:16:37'
   }
 ];

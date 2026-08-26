@@ -22,6 +22,12 @@ function getThumbnailUrl(url) {
   if (!url) return null
   const driveId = getDriveId(url)
   if (driveId) return `https://drive.google.com/thumbnail?id=${driveId}&sz=w800`
+
+  if (url.startsWith('/uploads/')) {
+    const fileName = url.split('/').pop()
+    return `/project-thumbnails/${fileName}`
+  }
+
   return url
 }
 
@@ -73,9 +79,11 @@ function VideoModal({ project, onClose }) {
 function ProjectCard({ project, index }) {
   const [showVideo, setShowVideo] = useState(false)
   const [showAllTechs, setShowAllTechs] = useState(false)
+  const [thumbnailFailed, setThumbnailFailed] = useState(false)
   const techs = project.technologies ? project.technologies.split(',').map(t => t.trim()).filter(Boolean) : []
   const visibleTechs = showAllTechs ? techs : techs.slice(0, 4)
   const hiddenTechsCount = techs.length - 4
+  const thumbnailUrl = getThumbnailUrl(project.thumbnail)
 
   return (
     <>
@@ -87,10 +95,11 @@ function ProjectCard({ project, index }) {
       >
         {/* Thumbnail or placeholder */}
         <div className="relative h-48 bg-gradient-to-br from-panel to-surface overflow-hidden">
-          {project.thumbnail ? (
+          {thumbnailUrl && !thumbnailFailed ? (
             <img
-              src={getThumbnailUrl(project.thumbnail)}
+              src={thumbnailUrl}
               alt={project.title}
+              onError={() => setThumbnailFailed(true)}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
             />
           ) : (
