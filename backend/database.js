@@ -123,8 +123,8 @@ function getPool() {
     pool = new Pool({
       connectionString: process.env.DATABASE_URL,
       ssl: { rejectUnauthorized: false },
-      connectionTimeoutMillis: 1500,
-      idleTimeoutMillis: 1500
+      connectionTimeoutMillis: 10000,
+      idleTimeoutMillis: 10000
     });
   }
   return pool;
