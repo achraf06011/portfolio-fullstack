@@ -8,6 +8,7 @@ export const fallbackProjects = [
     website_url: 'https://somafiam.com/',
     github_url: 'https://github.com/achraf06011/somafiam.git',
     thumbnail: 'https://drive.google.com/file/d/16_0hKDFPi7TijYZq0IQTAXo_27-Nr-hh/view?usp=sharing',
+    featured: true,
     created_at: '2026-08-10T18:12:16.080Z'
   },
   {
@@ -52,6 +53,7 @@ export const fallbackProjects = [
     website_url: null,
     github_url: 'https://github.com/achraf06011/showroom-achraf-automative.git',
     thumbnail: 'https://drive.google.com/file/d/1FnHorm7RF_2QRtP-hqlM6iaUw9tOnaWa/view?usp=sharing',
+    featured: true,
     created_at: '2026-06-21T12:00:59.523Z'
   },
   {
@@ -74,6 +76,7 @@ export const fallbackProjects = [
     website_url: null,
     github_url: 'https://github.com/achraf06011/Fluxo.git',
     thumbnail: 'https://drive.google.com/file/d/1-aDN-HqD_VzWGkQOx1cVADismIFV3Vw-/view?usp=sharing',
+    featured: true,
     created_at: '2026-06-08T18:11:34.006Z'
   },
   {

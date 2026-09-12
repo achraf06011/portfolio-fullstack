@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Plus, Edit2, Trash2, X, Save, Play, Link, Github, Image, LogOut, MessageSquare, FolderOpen, Eye } from 'lucide-react'
+import { Plus, Edit2, Trash2, X, Save, Play, Link, Github, Image, LogOut, MessageSquare, FolderOpen, Eye, Star } from 'lucide-react'
 import axios from 'axios'
 import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
@@ -159,6 +159,15 @@ export default function Admin() {
     }
   }
 
+  const handleToggleFeatured = async (p) => {
+    try {
+      await axios.put(`/api/projects/${p.id}`, { featured: !p.featured })
+      await load()
+    } catch {
+      alert('Erreur lors de la mise à jour du favori')
+    }
+  }
+
   const handleDelete = async () => {
     if (!deleteId) return
     setDeleting(true)
@@ -286,6 +295,11 @@ export default function Admin() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-3 mb-1">
                         <span className="text-sm font-medium text-white truncate">{p.title}</span>
+                        {p.featured && (
+                          <span className="tag flex items-center gap-1 text-xs" style={{ borderColor: 'rgba(240,192,64,0.4)', color: '#f0c040' }}>
+                            <Star size={8} fill="currentColor" /> Favori
+                          </span>
+                        )}
                         {p.video_url && (
                           <span className="tag flex items-center gap-1 text-xs">
                             <Play size={8} /> Vidéo
@@ -301,6 +315,13 @@ export default function Admin() {
                     </div>
 
                     <div className="flex items-center gap-2 flex-shrink-0">
+                      <button
+                        onClick={() => handleToggleFeatured(p)}
+                        title={p.featured ? 'Retirer des favoris' : 'Mettre en favori'}
+                        className={`w-8 h-8 rounded glass flex items-center justify-center transition-colors ${p.featured ? 'text-gold' : 'text-muted hover:text-gold'}`}
+                      >
+                        <Star size={13} fill={p.featured ? 'currentColor' : 'none'} />
+                      </button>
                       <button
                         onClick={() => setModal(p)}
                         className="w-8 h-8 rounded glass flex items-center justify-center text-muted hover:text-accent transition-colors"

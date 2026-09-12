@@ -9,7 +9,7 @@ const skills = {
 
 const timeline = [
   { year: '2026', title: 'Développeur Full Stack Senior', desc: 'Réalisation de projets web et mobiles avec React, React Native, Node.js, Express et MySQL.' },
-  { year: '2025', title: 'Développeur Web & Mobile', desc: 'Conception et développement d’applications modernes dans le cadre de projets académiques et personnels.' },
+  { year: '2025', title: 'Développeur Web', desc: 'Conception et développement d’applications modernes dans le cadre de projets académiques et personnels.' },
   { year: '2024', title: 'Étudiant en Développement Informatique', desc: 'Formation en développement des applications Desktop, bases de données, programmation orientée objet et génie logiciel.' },
   { year: '2023', title: 'Apprentissage & Projets Personnels', desc: 'Découverte du développement web et création de premiers projets avec HTML, CSS, JavaScript et PHP.' },
 ]

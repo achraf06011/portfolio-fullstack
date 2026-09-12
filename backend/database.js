@@ -23,6 +23,7 @@ const memoryStore = {
       website_url: 'https://somafiam.com/',
       github_url: 'https://github.com/achraf06011/somafiam.git',
       thumbnail: 'https://drive.google.com/file/d/16_0hKDFPi7TijYZq0IQTAXo_27-Nr-hh/view?usp=sharing',
+      featured: true,
       created_at: '2026-08-10T18:12:16.080Z'
     },
     {
@@ -34,6 +35,7 @@ const memoryStore = {
       website_url: 'https://rose-elegance.vercel.app/',
       github_url: 'https://github.com/achraf06011/rose-elegance.git',
       thumbnail: 'https://drive.google.com/file/d/1phqlO3mX90SYtv90C-k6EyNiXrO1G63I/view?usp=sharing',
+      featured: false,
       created_at: '2026-06-25T11:44:36.715Z'
     },
     {
@@ -45,6 +47,7 @@ const memoryStore = {
       website_url: 'https://achraf-industrielle-k9e5tjg2h-achraf06011s-projects.vercel.app/',
       github_url: 'https://github.com/achraf06011/achraf-industrielle.git',
       thumbnail: 'https://drive.google.com/file/d/14FTsIg33Dlt475VYsUCFa_Bx9LwbLYph/view?usp=sharing',
+      featured: false,
       created_at: '2026-06-24T20:56:48.003Z'
     },
     {
@@ -56,6 +59,7 @@ const memoryStore = {
       website_url: 'https://hotel-alkabir.vercel.app/',
       github_url: 'https://github.com/achraf06011/hotel-alkabir.git',
       thumbnail: 'https://drive.google.com/file/d/1Nh1cC6WBU2maHR01YTk01JQoOVFSk8fO/view?usp=sharing',
+      featured: false,
       created_at: '2026-06-21T15:10:07.318Z'
     },
     {
@@ -67,6 +71,7 @@ const memoryStore = {
       website_url: null,
       github_url: 'https://github.com/achraf06011/showroom-achraf-automative.git',
       thumbnail: 'https://drive.google.com/file/d/1FnHorm7RF_2QRtP-hqlM6iaUw9tOnaWa/view?usp=sharing',
+      featured: true,
       created_at: '2026-06-21T12:00:59.523Z'
     },
     {
@@ -78,6 +83,7 @@ const memoryStore = {
       website_url: null,
       github_url: 'https://github.com/achraf06011/Fluxo.git',
       thumbnail: 'https://drive.google.com/file/d/1GQbPUt3wpgKJrwlxCx3I9PkiO5eCAlj8/view?usp=sharing',
+      featured: false,
       created_at: '2026-06-08T18:12:38.234Z'
     },
     {
@@ -89,6 +95,7 @@ const memoryStore = {
       website_url: null,
       github_url: 'https://github.com/achraf06011/Fluxo.git',
       thumbnail: 'https://drive.google.com/file/d/1-aDN-HqD_VzWGkQOx1cVADismIFV3Vw-/view?usp=sharing',
+      featured: true,
       created_at: '2026-06-08T18:11:34.006Z'
     },
     {
@@ -100,6 +107,7 @@ const memoryStore = {
       website_url: null,
       github_url: null,
       thumbnail: 'https://drive.google.com/file/d/1rzFCjtzN3-Rm6tJjtZ5u6SN_G5Za4SVw/view?usp=sharing',
+      featured: false,
       created_at: '2026-06-08T17:20:48.112Z'
     }
   ],
@@ -192,8 +200,11 @@ async function initDB() {
       website_url TEXT,
       github_url TEXT,
       thumbnail TEXT,
+      featured BOOLEAN DEFAULT FALSE,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )`);
+
+    await db.query('ALTER TABLE projects ADD COLUMN IF NOT EXISTS featured BOOLEAN DEFAULT FALSE');
 
     await db.query(`CREATE TABLE IF NOT EXISTS messages (
       id SERIAL PRIMARY KEY,
@@ -234,7 +245,7 @@ function memoryRun(sql, params = []) {
   const normalized = normalize(sql);
 
   if (normalized.startsWith('INSERT INTO PROJECTS')) {
-    const [title, description, technologies, video_url, website_url, github_url, thumbnail] = params;
+    const [title, description, technologies, video_url, website_url, github_url, thumbnail, featured] = params;
     const project = {
       id: nextProjectId++,
       title,
@@ -244,6 +255,7 @@ function memoryRun(sql, params = []) {
       website_url,
       github_url,
       thumbnail,
+      featured: Boolean(featured),
       created_at: new Date().toISOString()
     };
     memoryStore.projects.unshift(project);
@@ -251,7 +263,7 @@ function memoryRun(sql, params = []) {
   }
 
   if (normalized.startsWith('UPDATE PROJECTS SET')) {
-    const id = Number(params[7]);
+    const id = Number(params[8]);
     const project = memoryStore.projects.find(item => item.id === id);
     if (project) {
       [
@@ -261,8 +273,10 @@ function memoryRun(sql, params = []) {
         project.video_url,
         project.website_url,
         project.github_url,
-        project.thumbnail
-      ] = params.slice(0, 7);
+        project.thumbnail,
+        project.featured
+      ] = params.slice(0, 8);
+      project.featured = Boolean(project.featured);
     }
     return { insertId: undefined, rows: [] };
   }
@@ -308,7 +322,11 @@ function memoryAll(sql) {
   const normalized = normalize(sql);
 
   if (normalized.includes('FROM PROJECTS')) {
-    return [...memoryStore.projects].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    return [...memoryStore.projects].sort((a, b) => {
+      const featuredDiff = (b.featured ? 1 : 0) - (a.featured ? 1 : 0);
+      if (featuredDiff !== 0) return featuredDiff;
+      return new Date(b.created_at) - new Date(a.created_at);
+    });
   }
 
   if (normalized.includes('FROM MESSAGES')) {

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ExternalLink, Github, Play, X, Code2, Calendar } from 'lucide-react'
+import { ExternalLink, Github, Play, X, Code2, Calendar, Star } from 'lucide-react'
 import axios from 'axios'
 import { fallbackProjects } from '../data/fallbackProjects'
 
@@ -16,6 +16,14 @@ function getVideoEmbed(url) {
   const yt = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&?]+)/)
   if (yt) return { type: 'iframe', src: `https://www.youtube.com/embed/${yt[1]}?autoplay=1` }
   return { type: 'video', src: url }
+}
+
+function sortProjects(list) {
+  return [...list].sort((a, b) => {
+    const featuredDiff = (b.featured ? 1 : 0) - (a.featured ? 1 : 0)
+    if (featuredDiff !== 0) return featuredDiff
+    return new Date(b.created_at) - new Date(a.created_at)
+  })
 }
 
 function getThumbnailUrl(url) {
@@ -133,6 +141,14 @@ function ProjectCard({ project, index }) {
               <span>Vidéo</span>
             </div>
           )}
+
+          {/* Featured badge */}
+          {project.featured && (
+            <div className="absolute top-3 left-3 tag flex items-center gap-1" style={{ borderColor: 'rgba(240,192,64,0.4)', color: '#f0c040' }}>
+              <Star size={10} fill="currentColor" />
+              <span>Favori</span>
+            </div>
+          )}
         </div>
 
         {/* Content */}
@@ -214,9 +230,9 @@ export default function Projects() {
 
   useEffect(() => {
     axios.get('/api/projects')
-      .then(res => setProjects(res.data))
+      .then(res => setProjects(sortProjects(res.data)))
       .catch(() => {
-        setProjects(fallbackProjects)
+        setProjects(sortProjects(fallbackProjects))
         setError(null)
       })
       .finally(() => setLoading(false))
