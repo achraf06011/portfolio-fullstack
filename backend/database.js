@@ -143,7 +143,13 @@ function toPostgres(sql) {
   return sql.replace(/\?/g, () => `$${++i}`);
 }
 
+let lastInitAttempt = 0;
+const RETRY_COOLDOWN_MS = 5000;
+
 async function getDB() {
+  if (useMemoryStore && Date.now() - lastInitAttempt > RETRY_COOLDOWN_MS) {
+    await attemptConnect();
+  }
   if (useMemoryStore) return { type: 'memory' };
   return getPool();
 }
@@ -176,11 +182,15 @@ async function all(db, sql, params = []) {
 function saveDB() {}
 
 async function initDB() {
-  if (useMemoryStore) {
+  if (!process.env.DATABASE_URL) {
     console.warn('DATABASE_URL is not configured; using in-memory portfolio data.');
     return;
   }
+  await attemptConnect();
+}
 
+async function attemptConnect() {
+  lastInitAttempt = Date.now();
   const db = getPool();
 
   try {
@@ -222,6 +232,8 @@ async function initDB() {
       console.log('Admin account created');
     }
 
+    useMemoryStore = false;
+    lastInitError = null;
     console.log('Database initialized');
   } catch (err) {
     useMemoryStore = true;
