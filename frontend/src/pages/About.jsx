@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import Seo from '../components/Seo'
 
 const skills = {
   'Frontend': ['React','React Native', 'Next.js', 'Tailwind CSS', 'HTML5', 'CSS3', 'JavaScript (ES6+)'],
@@ -25,6 +26,11 @@ const fadeUp = {
 export default function About() {
   return (
     <main className="min-h-screen bg-void grid-bg pt-28 pb-20 relative overflow-hidden">
+      <Seo
+        title="À Propos"
+        description="Développeur Full Stack passionné par l'architecture logicielle, React, Node.js et l'expérience utilisateur. Découvrez mon parcours et mes compétences."
+        path="/about"
+      />
       <div className="orb w-96 h-96 bg-accent opacity-8 -top-20 right-0" />
       <div className="orb w-64 h-64 bg-accent-2 opacity-6 bottom-40 left-0" />
 

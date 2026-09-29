@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /login
+
+Sitemap: https://portfolio-fullstack-opal-phi.vercel.app/sitemap.xml

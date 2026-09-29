@@ -3,20 +3,9 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ExternalLink, Github, Play, X, Code2, Calendar, Star } from 'lucide-react'
 import axios from 'axios'
 import { fallbackProjects } from '../data/fallbackProjects'
-
-function getDriveId(url) {
-  const m = url?.match(/drive\.google\.com\/file\/d\/([^/?]+)/)
-  return m ? m[1] : null
-}
-
-function getVideoEmbed(url) {
-  if (!url) return null
-  const driveId = getDriveId(url)
-  if (driveId) return { type: 'iframe', src: `https://drive.google.com/file/d/${driveId}/preview` }
-  const yt = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&?]+)/)
-  if (yt) return { type: 'iframe', src: `https://www.youtube.com/embed/${yt[1]}?autoplay=1` }
-  return { type: 'video', src: url }
-}
+import { Link } from 'react-router-dom'
+import Seo from '../components/Seo'
+import { getVideoEmbed, getThumbnailUrl } from '../utils/projectMedia'
 
 function sortProjects(list) {
   return [...list].sort((a, b) => {
@@ -24,19 +13,6 @@ function sortProjects(list) {
     if (featuredDiff !== 0) return featuredDiff
     return new Date(b.created_at) - new Date(a.created_at)
   })
-}
-
-function getThumbnailUrl(url) {
-  if (!url) return null
-  const driveId = getDriveId(url)
-  if (driveId) return `https://drive.google.com/thumbnail?id=${driveId}&sz=w800`
-
-  if (url.startsWith('/uploads/')) {
-    const fileName = url.split('/').pop()
-    return `/project-thumbnails/${fileName}`
-  }
-
-  return url
 }
 
 function VideoModal({ project, onClose }) {
@@ -154,9 +130,11 @@ function ProjectCard({ project, index }) {
         {/* Content */}
         <div className="p-6">
           <div className="flex items-start justify-between gap-4 mb-3">
-            <h3 className="font-display text-xl font-light text-white group-hover:text-accent transition-colors duration-300">
-              {project.title}
-            </h3>
+            <Link to={`/projects/${project.id}`}>
+              <h3 className="font-display text-xl font-light text-white group-hover:text-accent transition-colors duration-300">
+                {project.title}
+              </h3>
+            </Link>
             <div className="flex items-center gap-1 text-muted/50 text-xs font-mono whitespace-nowrap">
               <Calendar size={10} />
               <span>{new Date(project.created_at).getFullYear()}</span>
@@ -187,6 +165,11 @@ function ProjectCard({ project, index }) {
 
           {/* Actions */}
           <div className="flex flex-wrap gap-3 pt-4 border-t border-border">
+            <Link to={`/projects/${project.id}`}>
+              <button className="btn-outline flex items-center gap-2 text-xs px-4 py-2">
+                <span>Voir les détails</span>
+              </button>
+            </Link>
             {project.video_url && (
               <button
                 onClick={() => setShowVideo(true)}
@@ -240,6 +223,11 @@ export default function Projects() {
 
   return (
     <main className="min-h-screen bg-void grid-bg pt-28 pb-20 relative overflow-hidden">
+      <Seo
+        title="Projets"
+        description="Découvrez les projets web et mobiles réalisés par Achraf Aachchak : React, Node.js, Laravel et plus."
+        path="/projects"
+      />
       <div className="orb w-96 h-96 bg-accent opacity-8 -top-20 -right-20" />
       <div className="orb w-64 h-64 bg-accent-2 opacity-6 bottom-20 left-10" />
 

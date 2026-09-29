@@ -3,6 +3,7 @@ import { Github, Linkedin, Mail, Download, ArrowDown, Code2, Zap, Globe, Phone }
 import { Link } from 'react-router-dom'
 import monCV from '../CV_ACHRAF_AACHCHAK_WITH_PORTFOLIO.pdf'
 import PhonePopup from '../components/PhonePopup'
+import Seo from '../components/Seo'
 
 const socialLinks = [
   { icon: Github, href: 'https://github.com/achraf06011', label: 'GitHub' },
@@ -20,6 +21,7 @@ const stats = [
 export default function Home() {
   return (
     <main className="min-h-screen bg-void grid-bg relative overflow-hidden">
+      <Seo path="/" />
       {/* Orbs */}
       <div className="orb w-96 h-96 bg-accent opacity-10 top-20 -left-20" />
       <div className="orb w-80 h-80 bg-accent-2 opacity-8 bottom-40 right-20" />

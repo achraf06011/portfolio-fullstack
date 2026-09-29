@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { Send, Mail, Github, Linkedin, MapPin, CheckCircle, AlertCircle, Phone } from 'lucide-react'
 import PhonePopup from '../components/PhonePopup'
 import axios from 'axios'
+import Seo from '../components/Seo'
 
 export default function Contact() {
   const [form, setForm] = useState({ name: '', email: '', message: '' })
@@ -32,6 +33,11 @@ export default function Contact() {
 
   return (
     <main className="min-h-screen bg-void grid-bg pt-28 pb-20 relative overflow-hidden">
+      <Seo
+        title="Contact"
+        description="Contactez Achraf Aachchak, Développeur Full Stack, pour vos projets web et mobiles."
+        path="/contact"
+      />
       <div className="orb w-80 h-80 bg-accent opacity-10 top-20 left-0" />
       <div className="orb w-64 h-64 bg-accent-2 opacity-8 bottom-20 right-0" />
 
