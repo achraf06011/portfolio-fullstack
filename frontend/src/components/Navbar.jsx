@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, LogIn, LogOut, LayoutDashboard, Sun, Moon } from 'lucide-react'
+import { Menu, X, LogOut, LayoutDashboard, Sun, Moon } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
 import Logo from './Logo'
@@ -97,14 +97,7 @@ export default function Navbar() {
                 <span className="text-xs tracking-widest uppercase">Déconnexion</span>
               </button>
             </>
-          ) : (
-            <Link to="/login">
-              <button className="btn-primary flex items-center gap-2">
-                <span><LogIn size={14} /></span>
-                <span>Connexion</span>
-              </button>
-            </Link>
-          )}
+          ) : null}
         </div>
 
         {/* Mobile menu button */}
@@ -151,9 +144,7 @@ export default function Navbar() {
                   <Link to="/admin" className="text-sm tracking-widest uppercase text-accent">Dashboard</Link>
                   <button onClick={handleLogout} className="text-left text-sm tracking-widest uppercase text-accent-2">Déconnexion</button>
                 </>
-              ) : (
-                <Link to="/login" className="text-sm tracking-widest uppercase text-accent">Connexion</Link>
-              )}
+              ) : null}
             </div>
           </motion.div>
         )}
