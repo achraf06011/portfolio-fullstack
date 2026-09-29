@@ -206,8 +206,31 @@ function ProjectCard({ project, index }) {
   )
 }
 
+const TECH_CASING = {
+  css: 'CSS', css3: 'CSS3', html: 'HTML', html5: 'HTML5', sql: 'SQL', php: 'PHP',
+  ajax: 'AJAX', gsap: 'GSAP', api: 'API', 'rest api': 'REST API', 'c#': 'C#', orm: 'ORM',
+}
+
+function normalizeTech(raw) {
+  const cleaned = raw.trim().replace(/\.+$/, '').replace(/\s+/g, ' ')
+  if (!cleaned) return ''
+  const key = cleaned.toLowerCase()
+  return TECH_CASING[key] || cleaned
+}
+
+function dedupeTechs(list) {
+  const seen = new Map()
+  for (const raw of list) {
+    const cleaned = normalizeTech(raw)
+    if (!cleaned) continue
+    const key = cleaned.toLowerCase()
+    if (!seen.has(key)) seen.set(key, cleaned)
+  }
+  return [...seen.values()]
+}
+
 function getProjectTechs(project) {
-  return project.technologies ? project.technologies.split(',').map(t => t.trim()).filter(Boolean) : []
+  return project.technologies ? dedupeTechs(project.technologies.split(',')) : []
 }
 
 export default function Projects() {
@@ -215,6 +238,7 @@ export default function Projects() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [activeTag, setActiveTag] = useState(null)
+  const [showAllTags, setShowAllTags] = useState(false)
 
   useEffect(() => {
     axios.get('/api/projects')
@@ -226,7 +250,11 @@ export default function Projects() {
       .finally(() => setLoading(false))
   }, [])
 
-  const tags = [...new Set(projects.flatMap(getProjectTechs))].sort((a, b) => a.localeCompare(b))
+  const tags = dedupeTechs(projects.flatMap(project => project.technologies ? project.technologies.split(',') : []))
+    .sort((a, b) => a.localeCompare(b))
+  const visibleTagsLimit = 14
+  const visibleTags = showAllTags ? tags : tags.slice(0, visibleTagsLimit)
+  const hiddenTagsCount = tags.length - visibleTagsLimit
   const filteredProjects = activeTag
     ? projects.filter(project => getProjectTechs(project).includes(activeTag))
     : projects
@@ -274,7 +302,7 @@ export default function Projects() {
             >
               Tous
             </button>
-            {tags.map(tag => (
+            {visibleTags.map(tag => (
               <button
                 key={tag}
                 type="button"
@@ -284,6 +312,15 @@ export default function Projects() {
                 {tag}
               </button>
             ))}
+            {hiddenTagsCount > 0 && (
+              <button
+                type="button"
+                onClick={() => setShowAllTags(current => !current)}
+                className="tag-filter"
+              >
+                {showAllTags ? 'Réduire' : `+${hiddenTagsCount} de plus`}
+              </button>
+            )}
           </motion.div>
         )}
 
