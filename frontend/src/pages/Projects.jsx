@@ -206,10 +206,15 @@ function ProjectCard({ project, index }) {
   )
 }
 
+function getProjectTechs(project) {
+  return project.technologies ? project.technologies.split(',').map(t => t.trim()).filter(Boolean) : []
+}
+
 export default function Projects() {
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [activeTag, setActiveTag] = useState(null)
 
   useEffect(() => {
     axios.get('/api/projects')
@@ -220,6 +225,11 @@ export default function Projects() {
       })
       .finally(() => setLoading(false))
   }, [])
+
+  const tags = [...new Set(projects.flatMap(getProjectTechs))].sort((a, b) => a.localeCompare(b))
+  const filteredProjects = activeTag
+    ? projects.filter(project => getProjectTechs(project).includes(activeTag))
+    : projects
 
   return (
     <main className="min-h-screen bg-void grid-bg pt-28 pb-20 relative overflow-hidden">
@@ -249,6 +259,34 @@ export default function Projects() {
           <div className="line-accent mt-6" />
         </motion.div>
 
+        {/* Tag filters */}
+        {!loading && !error && tags.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.15 }}
+            className="flex flex-wrap gap-2 mb-12"
+          >
+            <button
+              type="button"
+              onClick={() => setActiveTag(null)}
+              className={`tag-filter ${activeTag === null ? 'active' : ''}`}
+            >
+              Tous
+            </button>
+            {tags.map(tag => (
+              <button
+                key={tag}
+                type="button"
+                onClick={() => setActiveTag(current => (current === tag ? null : tag))}
+                className={`tag-filter ${activeTag === tag ? 'active' : ''}`}
+              >
+                {tag}
+              </button>
+            ))}
+          </motion.div>
+        )}
+
         {/* Content */}
         {loading ? (
           <div className="flex justify-center py-24">
@@ -266,9 +304,14 @@ export default function Projects() {
             <Code2 size={48} className="text-muted/30 mx-auto mb-4" />
             <p className="text-muted font-light">Aucun projet pour l'instant.</p>
           </div>
+        ) : filteredProjects.length === 0 ? (
+          <div className="text-center py-24">
+            <Code2 size={48} className="text-muted/30 mx-auto mb-4" />
+            <p className="text-muted font-light">Aucun projet avec la technologie "{activeTag}".</p>
+          </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {projects.map((project, i) => (
+            {filteredProjects.map((project, i) => (
               <ProjectCard key={project.id} project={project} index={i} />
             ))}
           </div>

@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, LogIn, LogOut, LayoutDashboard } from 'lucide-react'
+import { Menu, X, LogIn, LogOut, LayoutDashboard, Sun, Moon } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
+import { useTheme } from '../context/ThemeContext'
 import Logo from './Logo'
 
 const navLinks = [
@@ -18,6 +19,7 @@ export default function Navbar() {
   const location = useLocation()
   const navigate = useNavigate()
   const { admin, logout } = useAuth()
+  const { theme, toggleTheme } = useTheme()
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 30)
@@ -75,6 +77,13 @@ export default function Navbar() {
 
         {/* Auth buttons */}
         <div className="hidden md:flex items-center gap-3">
+          <button
+            onClick={toggleTheme}
+            className="p-2 rounded-full text-muted hover:text-white hover:bg-white/5 transition-colors duration-300"
+            aria-label={theme === 'dark' ? 'Activer le mode clair' : 'Activer le mode sombre'}
+          >
+            {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+          </button>
           {admin ? (
             <>
               <Link to="/admin">
@@ -99,12 +108,21 @@ export default function Navbar() {
         </div>
 
         {/* Mobile menu button */}
-        <button
-          className="md:hidden text-white p-2"
-          onClick={() => setOpen(!open)}
-        >
-          {open ? <X size={20} /> : <Menu size={20} />}
-        </button>
+        <div className="md:hidden flex items-center gap-1">
+          <button
+            onClick={toggleTheme}
+            className="p-2 text-muted hover:text-white transition-colors"
+            aria-label={theme === 'dark' ? 'Activer le mode clair' : 'Activer le mode sombre'}
+          >
+            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
+          <button
+            className="text-white p-2"
+            onClick={() => setOpen(!open)}
+          >
+            {open ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile menu */}
