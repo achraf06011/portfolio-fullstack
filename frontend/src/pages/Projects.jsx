@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ExternalLink, Github, Play, X, Code2, Calendar, Star } from 'lucide-react'
+import { ExternalLink, Github, Play, X, Code2, Calendar, Star, AppWindow, Bot, ArrowLeft, ArrowRight } from 'lucide-react'
 import axios from 'axios'
 import { fallbackProjects } from '../data/fallbackProjects'
 import { Link } from 'react-router-dom'
@@ -233,6 +233,21 @@ function getProjectTechs(project) {
   return project.technologies ? dedupeTechs(project.technologies.split(',')) : []
 }
 
+const CATEGORIES = [
+  {
+    id: 'application',
+    label: 'Applications',
+    icon: AppWindow,
+    text: 'Sites web, applications web et mobiles que j\'ai développés.',
+  },
+  {
+    id: 'ai-agent',
+    label: 'Agents IA',
+    icon: Bot,
+    text: 'Agents intelligents qui automatisent des tâches : recherche d\'emploi, assistants et plus.',
+  },
+]
+
 export default function Projects() {
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
@@ -251,9 +266,10 @@ export default function Projects() {
       .finally(() => setLoading(false))
   }, [])
 
+  const projectCategory = project => project.category || 'application'
   const categoryProjects = activeCategory
-    ? projects.filter(project => (project.category || 'application') === activeCategory)
-    : projects
+    ? projects.filter(project => projectCategory(project) === activeCategory)
+    : []
 
   const tags = dedupeTechs(categoryProjects.flatMap(project => project.technologies ? project.technologies.split(',') : []))
     .sort((a, b) => a.localeCompare(b))
@@ -298,43 +314,73 @@ export default function Projects() {
           <div className="line-accent mt-6" />
         </motion.div>
 
-        {/* Category tabs */}
-        {!loading && !error && projects.length > 0 && (
+        {/* Étape 1 : choix de la catégorie */}
+        {!loading && !error && projects.length > 0 && !activeCategory && (
+          <div className="grid sm:grid-cols-2 gap-6 max-w-4xl">
+            {CATEGORIES.map((category, i) => {
+              const Icon = category.icon
+              const count = projects.filter(project => projectCategory(project) === category.id).length
+              return (
+                <motion.button
+                  key={category.id}
+                  type="button"
+                  onClick={() => handleCategoryChange(category.id)}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.1 + i * 0.1, ease: [0.23, 1, 0.32, 1] }}
+                  className="glass rounded-lg p-8 text-left card-hover group"
+                >
+                  <div className="w-14 h-14 rounded-lg border border-accent/40 flex items-center justify-center mb-6 text-accent">
+                    <Icon size={26} />
+                  </div>
+                  <h2 className="font-display text-3xl font-light text-white group-hover:text-accent transition-colors duration-300 mb-3">
+                    {category.label}
+                  </h2>
+                  <p className="text-muted text-sm leading-relaxed mb-6">{category.text}</p>
+                  <div className="flex items-center justify-between font-mono text-xs text-muted">
+                    <span>{count} projet{count > 1 ? 's' : ''}</span>
+                    <span className="flex items-center gap-2 text-accent">
+                      Voir <ArrowRight size={14} />
+                    </span>
+                  </div>
+                </motion.button>
+              )
+            })}
+          </div>
+        )}
+
+        {/* Étape 2 : retour + catégorie choisie */}
+        {!loading && !error && projects.length > 0 && activeCategory && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="flex flex-wrap gap-3 mb-6"
+            className="flex flex-wrap items-center gap-3 mb-6"
           >
             <button
               type="button"
               onClick={() => handleCategoryChange(null)}
-              className={`tag-filter ${activeCategory === null ? 'active' : ''}`}
-              style={{ fontSize: '0.8rem', padding: '0.5rem 1.25rem' }}
+              className="flex items-center gap-2 text-xs text-muted hover:text-white transition-colors px-3 py-2 tracking-widest uppercase"
             >
-              Tous
+              <ArrowLeft size={14} />
+              <span>Retour</span>
             </button>
-            <button
-              type="button"
-              onClick={() => handleCategoryChange('application')}
-              className={`tag-filter ${activeCategory === 'application' ? 'active' : ''}`}
-              style={{ fontSize: '0.8rem', padding: '0.5rem 1.25rem' }}
-            >
-              Applications
-            </button>
-            <button
-              type="button"
-              onClick={() => handleCategoryChange('ai-agent')}
-              className={`tag-filter ${activeCategory === 'ai-agent' ? 'active' : ''}`}
-              style={{ fontSize: '0.8rem', padding: '0.5rem 1.25rem' }}
-            >
-              Agents IA
-            </button>
+            {CATEGORIES.map(category => (
+              <button
+                key={category.id}
+                type="button"
+                onClick={() => handleCategoryChange(category.id)}
+                className={`tag-filter ${activeCategory === category.id ? 'active' : ''}`}
+                style={{ fontSize: '0.8rem', padding: '0.5rem 1.25rem' }}
+              >
+                {category.label}
+              </button>
+            ))}
           </motion.div>
         )}
 
         {/* Tag filters */}
-        {!loading && !error && tags.length > 0 && (
+        {!loading && !error && activeCategory && tags.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -371,7 +417,7 @@ export default function Projects() {
         )}
 
         {/* Content */}
-        {loading ? (
+        {!activeCategory && !loading ? null : loading ? (
           <div className="flex justify-center py-24">
             <div className="flex flex-col items-center gap-4">
               <div className="w-10 h-10 border-2 border-accent border-t-transparent rounded-full animate-spin" />
