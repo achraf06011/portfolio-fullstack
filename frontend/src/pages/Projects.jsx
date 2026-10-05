@@ -233,6 +233,14 @@ function getProjectTechs(project) {
   return project.technologies ? dedupeTechs(project.technologies.split(',')) : []
 }
 
+function topTechsOf(list, limit) {
+  const counts = new Map()
+  for (const project of list) {
+    for (const tech of getProjectTechs(project)) counts.set(tech, (counts.get(tech) || 0) + 1)
+  }
+  return [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, limit).map(([tech]) => tech)
+}
+
 const CATEGORIES = [
   {
     id: 'application',
@@ -316,10 +324,12 @@ export default function Projects() {
 
         {/* Étape 1 : choix de la catégorie */}
         {!loading && !error && projects.length > 0 && !activeCategory && (
-          <div className="grid sm:grid-cols-2 gap-6 max-w-4xl">
+          <div className="grid md:grid-cols-2 gap-6 lg:gap-8">
             {CATEGORIES.map((category, i) => {
               const Icon = category.icon
-              const count = projects.filter(project => projectCategory(project) === category.id).length
+              const inCategory = projects.filter(project => projectCategory(project) === category.id)
+              const count = inCategory.length
+              const topTechs = topTechsOf(inCategory, 5)
               return (
                 <motion.button
                   key={category.id}
@@ -328,20 +338,33 @@ export default function Projects() {
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.1 + i * 0.1, ease: [0.23, 1, 0.32, 1] }}
-                  className="glass rounded-lg p-8 text-left card-hover group"
+                  className="glass rounded-lg p-8 lg:p-10 text-left card-hover group relative overflow-hidden min-h-[340px] lg:min-h-[380px] flex flex-col"
                 >
-                  <div className="w-14 h-14 rounded-lg border border-accent/40 flex items-center justify-center mb-6 text-accent">
-                    <Icon size={26} />
-                  </div>
-                  <h2 className="font-display text-3xl font-light text-white group-hover:text-accent transition-colors duration-300 mb-3">
-                    {category.label}
-                  </h2>
-                  <p className="text-muted text-sm leading-relaxed mb-6">{category.text}</p>
-                  <div className="flex items-center justify-between font-mono text-xs text-muted">
-                    <span>{count} projet{count > 1 ? 's' : ''}</span>
-                    <span className="flex items-center gap-2 text-accent">
-                      Voir <ArrowRight size={14} />
-                    </span>
+                  <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-transparent opacity-60 group-hover:opacity-100 transition-opacity duration-500" />
+                  <span className="absolute right-6 top-2 font-display font-light text-[7rem] lg:text-[9rem] leading-none text-accent/10 select-none pointer-events-none">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+
+                  <div className="relative flex flex-col flex-1">
+                    <div className="w-16 h-16 rounded-lg border border-accent/40 bg-accent/10 flex items-center justify-center mb-6 text-accent">
+                      <Icon size={30} />
+                    </div>
+                    <h2 className="font-display text-4xl lg:text-5xl font-light text-white group-hover:text-accent transition-colors duration-300 mb-4">
+                      {category.label}
+                    </h2>
+                    <p className="text-muted text-base leading-relaxed max-w-md mb-6">{category.text}</p>
+                    <div className="flex flex-wrap gap-2 mb-6">
+                      {topTechs.map(tech => <span key={tech} className="tag">{tech}</span>)}
+                    </div>
+                    <div className="mt-auto flex items-center justify-between pt-6 border-t border-border">
+                      <span className="font-mono text-sm text-muted">{count} projet{count > 1 ? 's' : ''}</span>
+                      <span className="flex items-center gap-3 text-accent font-mono text-xs tracking-widest uppercase">
+                        Explorer
+                        <span className="w-10 h-10 rounded-full border border-accent/50 flex items-center justify-center group-hover:bg-accent group-hover:text-white transition-colors duration-300">
+                          <ArrowRight size={16} />
+                        </span>
+                      </span>
+                    </div>
                   </div>
                 </motion.button>
               )
