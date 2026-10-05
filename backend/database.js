@@ -44,7 +44,7 @@ const memoryStore = {
       description: "Site web premium pour une entreprise industrielle marocaine, trilingue FR/EN/AR avec RTL, panel admin complet, formulaire de devis, base Supabase, animations et déploiement Vercel.",
       technologies: 'Next.js 15, TypeScript, Tailwind CSS, Framer Motion, Supabase, next-intl, EmailJS',
       video_url: 'https://drive.google.com/file/d/1c2kPtDlmDSXG-5rj77Hx1-ZNpxsLF_oy/view?usp=sharing',
-      website_url: 'https://achraf-industrielle-k9e5tjg2h-achraf06011s-projects.vercel.app/',
+      website_url: 'https://achraf-industrielle.vercel.app/',
       github_url: 'https://github.com/achraf06011/achraf-industrielle.git',
       thumbnail: 'https://drive.google.com/file/d/14FTsIg33Dlt475VYsUCFa_Bx9LwbLYph/view?usp=sharing',
       featured: false,
