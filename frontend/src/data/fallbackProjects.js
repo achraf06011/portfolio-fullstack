@@ -3,7 +3,7 @@ export const fallbackProjects = [
     id: 9,
     title: 'Mon IA',
     description: "Assistant IA personnel conçu et déployé de bout en bout. Il répond à des questions dans tous les domaines, lit des documents PDF et des images (y compris depuis l'appareil photo du téléphone), rédige des lettres, des rapports ou des CV au format Word et PDF, et traite des fichiers Excel. Chaque utilisateur dispose d'un compte et d'un historique de conversations privé, l'accès se fait sur invitation. Le projet repose uniquement sur des modèles d'IA gratuits : l'application bascule automatiquement de l'un à l'autre lorsqu'un quota est atteint, ce qui a demandé un vrai travail de fiabilité.",
-    technologies: 'Python, PostgreSQL, SQLAlchemy, Groq, Google Gemini, OpenAI API, DuckDuckGo, PyPDF, OpenPyXL, python-docx, ReportLab, Vercel, Neon',
+    technologies: 'Python, PostgreSQL, SQLAlchemy, Groq, Qwen, Google Gemini, OpenAI API, DuckDuckGo, PyPDF, OpenPyXL, python-docx, ReportLab, Vercel, Neon',
     category: 'ai-agent',
     video_url: 'https://drive.google.com/file/d/1BmKor-V1Z7kzVC9OO_76uIQC4XJO7NX6/view?usp=sharing',
     website_url: 'https://achraf-agent.vercel.app/',
