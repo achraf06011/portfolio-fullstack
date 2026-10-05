@@ -26,7 +26,7 @@ function VideoModal({ project, onClose }) {
       style={{ background: 'rgba(5, 5, 8, 0.95)' }}
       onClick={onClose}
     >
-      <motion.div
+    <motion.div
         initial={{ scale: 0.85, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.85, opacity: 0 }}
@@ -71,7 +71,7 @@ function ProjectCard({ project, index }) {
 
   return (
     <>
-      <motion.div
+    <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: index * 0.1, ease: [0.23, 1, 0.32, 1] }}
@@ -256,6 +256,65 @@ const CATEGORIES = [
   },
 ]
 
+function CategoryCard({ category, index, projectsInCategory, onSelect }) {
+  const [showAll, setShowAll] = useState(false)
+  const Icon = category.icon
+  const count = projectsInCategory.length
+  const allTechs = topTechsOf(projectsInCategory, Infinity)
+  const shownTechs = showAll ? allTechs : allTechs.slice(0, 5)
+  const hiddenCount = allTechs.length - 5
+  const i = index
+  return (
+    <motion.div
+      role="button"
+      tabIndex={0}
+      onClick={onSelect}
+      onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect() } }}
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.1 + i * 0.1, ease: [0.23, 1, 0.32, 1] }}
+        className="glass rounded-lg p-8 lg:p-10 text-left card-hover group relative overflow-hidden min-h-[340px] lg:min-h-[380px] flex flex-col"
+      >
+        <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-transparent opacity-60 group-hover:opacity-100 transition-opacity duration-500" />
+        <span className="absolute right-6 top-2 font-display font-light text-[7rem] lg:text-[9rem] leading-none text-accent/10 select-none pointer-events-none">
+          {String(i + 1).padStart(2, '0')}
+        </span>
+
+        <div className="relative flex flex-col flex-1">
+          <div className="w-16 h-16 rounded-lg border border-accent/40 bg-accent/10 flex items-center justify-center mb-6 text-accent">
+            <Icon size={30} />
+          </div>
+          <h2 className="font-display text-4xl lg:text-5xl font-light text-white group-hover:text-accent transition-colors duration-300 mb-4">
+            {category.label}
+          </h2>
+          <p className="text-muted text-base leading-relaxed max-w-md mb-6">{category.text}</p>
+          <div className="flex flex-wrap gap-2 mb-6">
+            {shownTechs.map(tech => <span key={tech} className="tag">{tech}</span>)}
+            {hiddenCount > 0 && (
+              <button
+                type="button"
+                onClick={e => { e.stopPropagation(); setShowAll(current => !current) }}
+                className="tag hover:border-accent hover:text-white transition-colors"
+                aria-expanded={showAll}
+              >
+                {showAll ? 'Réduire' : `+${hiddenCount} voir plus`}
+              </button>
+            )}
+          </div>
+          <div className="mt-auto flex items-center justify-between pt-6 border-t border-border">
+            <span className="font-mono text-sm text-muted">{count} projet{count > 1 ? 's' : ''}</span>
+            <span className="flex items-center gap-3 text-accent font-mono text-xs tracking-widest uppercase">
+              Explorer
+              <span className="w-10 h-10 rounded-full border border-accent/50 flex items-center justify-center group-hover:bg-accent group-hover:text-white transition-colors duration-300">
+                <ArrowRight size={16} />
+              </span>
+            </span>
+          </div>
+        </div>
+      </motion.div>
+  )
+}
+
 export default function Projects() {
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
@@ -325,50 +384,15 @@ export default function Projects() {
         {/* Étape 1 : choix de la catégorie */}
         {!loading && !error && projects.length > 0 && !activeCategory && (
           <div className="grid md:grid-cols-2 gap-6 lg:gap-8">
-            {CATEGORIES.map((category, i) => {
-              const Icon = category.icon
-              const inCategory = projects.filter(project => projectCategory(project) === category.id)
-              const count = inCategory.length
-              const topTechs = topTechsOf(inCategory, 5)
-              return (
-                <motion.button
-                  key={category.id}
-                  type="button"
-                  onClick={() => handleCategoryChange(category.id)}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.1 + i * 0.1, ease: [0.23, 1, 0.32, 1] }}
-                  className="glass rounded-lg p-8 lg:p-10 text-left card-hover group relative overflow-hidden min-h-[340px] lg:min-h-[380px] flex flex-col"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-transparent opacity-60 group-hover:opacity-100 transition-opacity duration-500" />
-                  <span className="absolute right-6 top-2 font-display font-light text-[7rem] lg:text-[9rem] leading-none text-accent/10 select-none pointer-events-none">
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
-
-                  <div className="relative flex flex-col flex-1">
-                    <div className="w-16 h-16 rounded-lg border border-accent/40 bg-accent/10 flex items-center justify-center mb-6 text-accent">
-                      <Icon size={30} />
-                    </div>
-                    <h2 className="font-display text-4xl lg:text-5xl font-light text-white group-hover:text-accent transition-colors duration-300 mb-4">
-                      {category.label}
-                    </h2>
-                    <p className="text-muted text-base leading-relaxed max-w-md mb-6">{category.text}</p>
-                    <div className="flex flex-wrap gap-2 mb-6">
-                      {topTechs.map(tech => <span key={tech} className="tag">{tech}</span>)}
-                    </div>
-                    <div className="mt-auto flex items-center justify-between pt-6 border-t border-border">
-                      <span className="font-mono text-sm text-muted">{count} projet{count > 1 ? 's' : ''}</span>
-                      <span className="flex items-center gap-3 text-accent font-mono text-xs tracking-widest uppercase">
-                        Explorer
-                        <span className="w-10 h-10 rounded-full border border-accent/50 flex items-center justify-center group-hover:bg-accent group-hover:text-white transition-colors duration-300">
-                          <ArrowRight size={16} />
-                        </span>
-                      </span>
-                    </div>
-                  </div>
-                </motion.button>
-              )
-            })}
+            {CATEGORIES.map((category, i) => (
+              <CategoryCard
+                key={category.id}
+                category={category}
+                index={i}
+                projectsInCategory={projects.filter(project => projectCategory(project) === category.id)}
+                onSelect={() => handleCategoryChange(category.id)}
+              />
+            ))}
           </div>
         )}
 
