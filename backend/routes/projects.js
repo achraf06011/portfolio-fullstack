@@ -22,13 +22,13 @@ router.get('/:id', async (req, res) => {
 });
 
 router.post('/', authMiddleware, async (req, res) => {
-  const { title, description, technologies, website_url, github_url, video_url, thumbnail, featured } = req.body;
+  const { title, description, technologies, website_url, github_url, video_url, thumbnail, featured, category } = req.body;
   if (!title || !description || !technologies) return res.status(400).json({ error: 'Required fields missing' });
   try {
     const db = await getDB();
     const result = await run(db,
-      'INSERT INTO projects (title,description,technologies,video_url,website_url,github_url,thumbnail,featured) VALUES (?,?,?,?,?,?,?,?)',
-      [title, description, technologies, video_url || null, website_url || null, github_url || null, thumbnail || null, Boolean(featured)]
+      'INSERT INTO projects (title,description,technologies,video_url,website_url,github_url,thumbnail,featured,category) VALUES (?,?,?,?,?,?,?,?,?)',
+      [title, description, technologies, video_url || null, website_url || null, github_url || null, thumbnail || null, Boolean(featured), category || 'application']
     );
     const project = await get(db, 'SELECT * FROM projects WHERE id = ?', [result.insertId]);
     res.status(201).json(project);
@@ -40,9 +40,9 @@ router.put('/:id', authMiddleware, async (req, res) => {
     const db = await getDB();
     const existing = await get(db, 'SELECT * FROM projects WHERE id = ?', [req.params.id]);
     if (!existing) return res.status(404).json({ error: 'Not found' });
-    const { title, description, technologies, website_url, github_url, video_url, thumbnail, featured } = req.body;
+    const { title, description, technologies, website_url, github_url, video_url, thumbnail, featured, category } = req.body;
     await run(db,
-      'UPDATE projects SET title=?,description=?,technologies=?,video_url=?,website_url=?,github_url=?,thumbnail=?,featured=? WHERE id=?',
+      'UPDATE projects SET title=?,description=?,technologies=?,video_url=?,website_url=?,github_url=?,thumbnail=?,featured=?,category=? WHERE id=?',
       [
         title || existing.title,
         description || existing.description,
@@ -52,6 +52,7 @@ router.put('/:id', authMiddleware, async (req, res) => {
         github_url !== undefined ? github_url || null : existing.github_url,
         thumbnail !== undefined ? thumbnail || null : existing.thumbnail,
         featured !== undefined ? Boolean(featured) : existing.featured,
+        category !== undefined ? category || 'application' : (existing.category || 'application'),
         req.params.id
       ]
     );

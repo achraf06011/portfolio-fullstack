@@ -1,6 +1,6 @@
 let pool = null;
 let useMemoryStore = !process.env.DATABASE_URL;
-let nextProjectId = 9;
+let nextProjectId = 11;
 let nextMessageId = 2;
 let lastInitError = null;
 
@@ -15,10 +15,37 @@ const memoryStore = {
   ],
   projects: [
     {
+      id: 10,
+      title: 'Job Agent',
+      description: "Assistant de recherche d'emploi basé sur l'IA, pensé pour le marché marocain. Chaque utilisateur envoie son CV (PDF, Word, texte ou photo) et l'agent analyse le profil (titre, niveau, compétences, langues, villes), recherche les offres pertinentes sur plusieurs plateformes au Maroc et en télétravail international, puis note chaque offre sur 100 par rapport au CV avec les raisons, en écartant celles trop seniors, trop anciennes ou hors profil. Il adapte automatiquement le CV à chaque offre en conservant le design d'origine, rédige une lettre de motivation personnalisée, et envoie la candidature depuis le Gmail de l'utilisateur après relecture, jamais automatiquement. Des notifications sont envoyées via Telegram grâce à une automatisation n8n. L'application est multi-utilisateur, avec CV et offres isolés par compte.",
+      technologies: 'Python, FastAPI, SQLite, Google Gemini, Claude (Anthropic), PyMuPDF, python-docx, ReportLab, Google OAuth, Gmail API, n8n, Telegram Bot API, LinkedIn, Indeed, Rekrute, Jooble',
+      category: 'ai-agent',
+      video_url: 'https://drive.google.com/file/d/1vc1qh2aofb83qdDujIdU-h-7fv7Ums_I/view?usp=sharing',
+      website_url: null,
+      github_url: null,
+      thumbnail: null,
+      featured: true,
+      created_at: '2026-10-05T12:05:00.000Z'
+    },
+    {
+      id: 9,
+      title: 'Mon IA',
+      description: "Assistant IA personnel conçu et déployé de bout en bout. Il répond à des questions dans tous les domaines, lit des documents PDF et des images (y compris depuis l'appareil photo du téléphone), rédige des lettres, des rapports ou des CV au format Word et PDF, et traite des fichiers Excel. Chaque utilisateur dispose d'un compte et d'un historique de conversations privé, l'accès se fait sur invitation. Le projet repose uniquement sur des modèles d'IA gratuits : l'application bascule automatiquement de l'un à l'autre lorsqu'un quota est atteint, ce qui a demandé un vrai travail de fiabilité.",
+      technologies: 'Python, PostgreSQL, SQLAlchemy, Groq, Google Gemini, OpenAI API, DuckDuckGo, PyPDF, OpenPyXL, python-docx, ReportLab, Vercel, Neon',
+      category: 'ai-agent',
+      video_url: 'https://drive.google.com/file/d/1BmKor-V1Z7kzVC9OO_76uIQC4XJO7NX6/view?usp=sharing',
+      website_url: 'https://achraf-agent.vercel.app/',
+      github_url: null,
+      thumbnail: null,
+      featured: true,
+      created_at: '2026-10-05T12:00:00.000Z'
+    },
+    {
       id: 8,
       title: 'SOMAFIAM S.A',
       description: "Site web vitrine et catalogue produits pour SOMAFIAM S.A, présentant les gammes d'équipements industriels, agricoles, métallurgiques, BTP, mines, manutention, robotique et transformation alimentaire.",
       technologies: 'PHP, Laravel, Blade, HTML, CSS, JavaScript, MySQL, SQL, Bootstrap, Vite',
+      category: 'application',
       video_url: 'https://drive.google.com/file/d/1Z_q7eqOcGlhB_95sAK85OGYJ5k7rdTXc/view?usp=sharing',
       website_url: 'https://somafiam.com/',
       github_url: 'https://github.com/achraf06011/somafiam.git',
@@ -31,6 +58,7 @@ const memoryStore = {
       title: 'Rose Élégance — Site vitrine fleuriste premium',
       description: "Site vitrine premium pour une fleuriste parisienne, avec un design éditorial haut de gamme inspiré des maisons de mode et un panneau d'administration complet pour gérer catégories, produits, photos et prix.",
       technologies: 'React, Vite, Tailwind CSS, Framer Motion, Supabase, PostgreSQL, Vercel, React Leaflet',
+      category: 'application',
       video_url: 'https://drive.google.com/file/d/1_zA4eCYVKfPH1q3Qr8B0CdUl3BfPozn-/view?usp=sharing',
       website_url: 'https://rose-elegance.vercel.app/',
       github_url: 'https://github.com/achraf06011/rose-elegance.git',
@@ -43,6 +71,7 @@ const memoryStore = {
       title: 'ACHRAF INDUSTRIELLE — Site web industriel',
       description: "Site web premium pour une entreprise industrielle marocaine, trilingue FR/EN/AR avec RTL, panel admin complet, formulaire de devis, base Supabase, animations et déploiement Vercel.",
       technologies: 'Next.js 15, TypeScript, Tailwind CSS, Framer Motion, Supabase, next-intl, EmailJS',
+      category: 'application',
       video_url: 'https://drive.google.com/file/d/1c2kPtDlmDSXG-5rj77Hx1-ZNpxsLF_oy/view?usp=sharing',
       website_url: 'https://achraf-industrielle.vercel.app/',
       github_url: 'https://github.com/achraf06011/achraf-industrielle.git',
@@ -55,6 +84,7 @@ const memoryStore = {
       title: "Hôtel Al Kabir - Site Web gestion d'hôtel",
       description: "Site web complet pour l'Hôtel Al Kabir à Marrakech, avec site vitrine, galerie, présentation des chambres, réservation en ligne, espace client et panneau d'administration.",
       technologies: 'Next.js 15, TypeScript, Tailwind CSS, Prisma ORM, PostgreSQL, Supabase, NextAuth.js, Vercel',
+      category: 'application',
       video_url: 'https://drive.google.com/file/d/10zjr8FNuqtR38rPOe5jqLXSRJfbY1Fmw/view?usp=sharing',
       website_url: 'https://hotel-alkabir.vercel.app/',
       github_url: 'https://github.com/achraf06011/hotel-alkabir.git',
@@ -67,6 +97,7 @@ const memoryStore = {
       title: 'Achraf Automotive — Showroom de véhicules premium',
       description: "Plateforme web premium dédiée à la vente de véhicules d'exception avec catalogue filtrable, fiches immersives, visualisation 3D, réservation d'essai, contact et espace administrateur.",
       technologies: 'React, Node.js, Express, MySQL, Three.js, Tailwind CSS, GSAP, Framer Motion, Vite',
+      category: 'application',
       video_url: 'https://drive.google.com/file/d/1g9YqekAONKDCGWTes9U-UEYr0I2fIxB5/view?usp=sharing',
       website_url: null,
       github_url: 'https://github.com/achraf06011/showroom-achraf-automative.git',
@@ -79,6 +110,7 @@ const memoryStore = {
       title: 'Fluxo Mobile - Marketplace de Vente Entre Particuliers',
       description: "Application mobile de la plateforme Fluxo permettant d'acheter et vendre entre particuliers, gérer les annonces, rechercher des produits, échanger par messagerie et suivre les commandes.",
       technologies: 'React Native, Expo, JavaScript, Node.js, Express.js, MySQL, REST API, Pusher, Git, GitHub',
+      category: 'application',
       video_url: 'https://drive.google.com/file/d/1Va9d1cjLoHavQN7o58Usu2bTR4LX52z0/view?usp=sharing',
       website_url: null,
       github_url: 'https://github.com/achraf06011/Fluxo.git',
@@ -91,6 +123,7 @@ const memoryStore = {
       title: 'Fluxo - Marketplace Web de Vente Entre Particuliers',
       description: "Marketplace web moderne permettant aux utilisateurs d'acheter et vendre des produits entre particuliers avec annonces, messagerie instantanée, panier, commandes et administration.",
       technologies: 'PHP, MySQL, JavaScript, HTML5, CSS3, Bootstrap, AJAX, Pusher, PHPMailer, Git, GitHub',
+      category: 'application',
       video_url: 'https://drive.google.com/file/d/1gQ5ccbT3YJyAa9g7mmuMCoB0w8fLmJib/view?usp=sharing',
       website_url: null,
       github_url: 'https://github.com/achraf06011/Fluxo.git',
@@ -103,6 +136,7 @@ const memoryStore = {
       title: 'Gestion de Cabinet Médical',
       description: "Application de bureau complète destinée à l'administration d'un cabinet médical avec gestion des accès par rôles, dossiers médicaux, rendez-vous, factures, stock, impressions, statistiques et chat interne.",
       technologies: 'C#, MySQL',
+      category: 'application',
       video_url: 'https://drive.google.com/file/d/15-s4O-e04aPq_dHrrKIACKRG63cADN9a/view?usp=sharing',
       website_url: null,
       github_url: null,
@@ -211,10 +245,12 @@ async function attemptConnect() {
       github_url TEXT,
       thumbnail TEXT,
       featured BOOLEAN DEFAULT FALSE,
+      category VARCHAR(50) DEFAULT 'application',
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )`);
 
     await db.query('ALTER TABLE projects ADD COLUMN IF NOT EXISTS featured BOOLEAN DEFAULT FALSE');
+    await db.query("ALTER TABLE projects ADD COLUMN IF NOT EXISTS category VARCHAR(50) DEFAULT 'application'");
 
     await db.query(`CREATE TABLE IF NOT EXISTS messages (
       id SERIAL PRIMARY KEY,
@@ -257,7 +293,7 @@ function memoryRun(sql, params = []) {
   const normalized = normalize(sql);
 
   if (normalized.startsWith('INSERT INTO PROJECTS')) {
-    const [title, description, technologies, video_url, website_url, github_url, thumbnail, featured] = params;
+    const [title, description, technologies, video_url, website_url, github_url, thumbnail, featured, category] = params;
     const project = {
       id: nextProjectId++,
       title,
@@ -268,6 +304,7 @@ function memoryRun(sql, params = []) {
       github_url,
       thumbnail,
       featured: Boolean(featured),
+      category: category || 'application',
       created_at: new Date().toISOString()
     };
     memoryStore.projects.unshift(project);
@@ -275,7 +312,7 @@ function memoryRun(sql, params = []) {
   }
 
   if (normalized.startsWith('UPDATE PROJECTS SET')) {
-    const id = Number(params[8]);
+    const id = Number(params[9]);
     const project = memoryStore.projects.find(item => item.id === id);
     if (project) {
       [
@@ -286,9 +323,11 @@ function memoryRun(sql, params = []) {
         project.website_url,
         project.github_url,
         project.thumbnail,
-        project.featured
-      ] = params.slice(0, 8);
+        project.featured,
+        project.category
+      ] = params.slice(0, 9);
       project.featured = Boolean(project.featured);
+      project.category = project.category || 'application';
     }
     return { insertId: undefined, rows: [] };
   }

@@ -8,11 +8,11 @@ import { useNavigate } from 'react-router-dom'
 const emptyForm = {
   title: '', description: '', technologies: '',
   website_url: '', github_url: '',
-  video_url: '', thumbnail: ''
+  video_url: '', thumbnail: '', category: 'application'
 }
 
 function ProjectForm({ initial, onSave, onCancel, loading }) {
-  const [form, setForm] = useState(initial || emptyForm)
+  const [form, setForm] = useState({ ...emptyForm, ...initial })
 
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }))
 
@@ -29,9 +29,17 @@ function ProjectForm({ initial, onSave, onCancel, loading }) {
           <input value={form.title} onChange={e => set('title', e.target.value)} placeholder="Mon super projet" required />
         </div>
         <div>
-          <label>Technologies * (séparées par virgule)</label>
-          <input value={form.technologies} onChange={e => set('technologies', e.target.value)} placeholder="React, Node.js, MySQL" required />
+          <label>Catégorie *</label>
+          <select value={form.category} onChange={e => set('category', e.target.value)} required>
+            <option value="application">Application</option>
+            <option value="ai-agent">Agent IA</option>
+          </select>
         </div>
+      </div>
+
+      <div>
+        <label>Technologies * (séparées par virgule)</label>
+        <input value={form.technologies} onChange={e => set('technologies', e.target.value)} placeholder="React, Node.js, MySQL" required />
       </div>
 
       <div>
@@ -143,6 +151,7 @@ export default function Admin() {
         github_url: form.github_url || null,
         video_url: form.video_url || null,
         thumbnail: form.thumbnail || null,
+        category: form.category || 'application',
       }
       if (modal === 'add') {
         await axios.post('/api/projects', payload)
@@ -295,6 +304,9 @@ export default function Admin() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-3 mb-1">
                         <span className="text-sm font-medium text-white truncate">{p.title}</span>
+                        <span className="tag flex items-center gap-1 text-xs">
+                          {p.category === 'ai-agent' ? 'Agent IA' : 'Application'}
+                        </span>
                         {p.featured && (
                           <span className="tag flex items-center gap-1 text-xs" style={{ borderColor: 'rgba(240,192,64,0.4)', color: '#f0c040' }}>
                             <Star size={8} fill="currentColor" /> Favori

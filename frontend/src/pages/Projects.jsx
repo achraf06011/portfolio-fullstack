@@ -239,6 +239,7 @@ export default function Projects() {
   const [error, setError] = useState(null)
   const [activeTag, setActiveTag] = useState(null)
   const [showAllTags, setShowAllTags] = useState(false)
+  const [activeCategory, setActiveCategory] = useState(null)
 
   useEffect(() => {
     axios.get('/api/projects')
@@ -250,14 +251,24 @@ export default function Projects() {
       .finally(() => setLoading(false))
   }, [])
 
-  const tags = dedupeTechs(projects.flatMap(project => project.technologies ? project.technologies.split(',') : []))
+  const categoryProjects = activeCategory
+    ? projects.filter(project => (project.category || 'application') === activeCategory)
+    : projects
+
+  const tags = dedupeTechs(categoryProjects.flatMap(project => project.technologies ? project.technologies.split(',') : []))
     .sort((a, b) => a.localeCompare(b))
   const visibleTagsLimit = 14
   const visibleTags = showAllTags ? tags : tags.slice(0, visibleTagsLimit)
   const hiddenTagsCount = tags.length - visibleTagsLimit
   const filteredProjects = activeTag
-    ? projects.filter(project => getProjectTechs(project).includes(activeTag))
-    : projects
+    ? categoryProjects.filter(project => getProjectTechs(project).includes(activeTag))
+    : categoryProjects
+
+  const handleCategoryChange = (category) => {
+    setActiveCategory(category)
+    setActiveTag(null)
+    setShowAllTags(false)
+  }
 
   return (
     <main className="min-h-screen bg-void grid-bg pt-28 pb-20 relative overflow-hidden">
@@ -286,6 +297,41 @@ export default function Projects() {
           </p>
           <div className="line-accent mt-6" />
         </motion.div>
+
+        {/* Category tabs */}
+        {!loading && !error && projects.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="flex flex-wrap gap-3 mb-6"
+          >
+            <button
+              type="button"
+              onClick={() => handleCategoryChange(null)}
+              className={`tag-filter ${activeCategory === null ? 'active' : ''}`}
+              style={{ fontSize: '0.8rem', padding: '0.5rem 1.25rem' }}
+            >
+              Tous
+            </button>
+            <button
+              type="button"
+              onClick={() => handleCategoryChange('application')}
+              className={`tag-filter ${activeCategory === 'application' ? 'active' : ''}`}
+              style={{ fontSize: '0.8rem', padding: '0.5rem 1.25rem' }}
+            >
+              Applications
+            </button>
+            <button
+              type="button"
+              onClick={() => handleCategoryChange('ai-agent')}
+              className={`tag-filter ${activeCategory === 'ai-agent' ? 'active' : ''}`}
+              style={{ fontSize: '0.8rem', padding: '0.5rem 1.25rem' }}
+            >
+              Agents IA
+            </button>
+          </motion.div>
+        )}
 
         {/* Tag filters */}
         {!loading && !error && tags.length > 0 && (
@@ -344,7 +390,11 @@ export default function Projects() {
         ) : filteredProjects.length === 0 ? (
           <div className="text-center py-24">
             <Code2 size={48} className="text-muted/30 mx-auto mb-4" />
-            <p className="text-muted font-light">Aucun projet avec la technologie "{activeTag}".</p>
+            <p className="text-muted font-light">
+              {activeTag
+                ? `Aucun projet avec la technologie "${activeTag}".`
+                : 'Aucun projet dans cette catégorie pour l\'instant.'}
+            </p>
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
