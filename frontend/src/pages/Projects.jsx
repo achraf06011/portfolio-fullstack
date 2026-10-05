@@ -233,6 +233,10 @@ function getProjectTechs(project) {
   return project.technologies ? dedupeTechs(project.technologies.split(',')) : []
 }
 
+// Pour la catégorie « Agents IA » : on ne montre que les modèles d'IA (Claude, ChatGPT, Gemini, Groq…)
+const AI_MODEL = /claude|anthropic|openai|chatgpt|gpt|gemini|groq|grok|llama|mistral|deepseek|ollama|perplexity|copilot|cohere|qwen|hugging ?face/i
+const onlyAiModels = techs => techs.filter(tech => AI_MODEL.test(tech))
+
 function topTechsOf(list, limit) {
   const counts = new Map()
   for (const project of list) {
@@ -260,7 +264,8 @@ function CategoryCard({ category, index, projectsInCategory, onSelect }) {
   const [showAll, setShowAll] = useState(false)
   const Icon = category.icon
   const count = projectsInCategory.length
-  const allTechs = topTechsOf(projectsInCategory, Infinity)
+  const techsOfCategory = topTechsOf(projectsInCategory, Infinity)
+  const allTechs = category.id === 'ai-agent' ? onlyAiModels(techsOfCategory) : techsOfCategory
   const shownTechs = showAll ? allTechs : allTechs.slice(0, 5)
   const hiddenCount = allTechs.length - 5
   const i = index
@@ -338,7 +343,8 @@ export default function Projects() {
     ? projects.filter(project => projectCategory(project) === activeCategory)
     : []
 
-  const tags = dedupeTechs(categoryProjects.flatMap(project => project.technologies ? project.technologies.split(',') : []))
+  const categoryTechs = dedupeTechs(categoryProjects.flatMap(project => project.technologies ? project.technologies.split(',') : []))
+  const tags = (activeCategory === 'ai-agent' ? onlyAiModels(categoryTechs) : categoryTechs)
     .sort((a, b) => a.localeCompare(b))
   const visibleTagsLimit = 14
   const visibleTags = showAllTags ? tags : tags.slice(0, visibleTagsLimit)
