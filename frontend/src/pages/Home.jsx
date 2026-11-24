@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import { Github, Linkedin, Mail, Download, ArrowDown, Code2, Zap, Globe, Phone } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import monCV from '../CV_ACHRAF_AACHCHAK_WITH_PORTFOLIO.pdf'
+import monCV from '../CV_Achraf_Aachchak_FR_v2.pdf'
 import PhonePopup from '../components/PhonePopup'
 import Seo from '../components/Seo'
 
@@ -88,7 +88,7 @@ export default function Home() {
               </Link>
               <a 
                 href={monCV} 
-                download="CV_ACHRAF_AACHCHAK.pdf"
+                download="CV_Achraf_Aachchak_FR_v2.pdf"
                 className="btn-outline flex items-center gap-2"
               >
                 <Download size={14} />
